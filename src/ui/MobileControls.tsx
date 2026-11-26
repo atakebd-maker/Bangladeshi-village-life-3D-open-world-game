@@ -1,39 +1,63 @@
 import React, { useRef, useState } from 'react';
 import {
   Armchair,
-  ArrowDownToLine,
   ArrowLeft,
   ArrowRight,
-  ArrowUpFromLine,
   Car,
+  DoorOpen,
   Footprints,
   Hand,
   LogOut,
-  Shield,
+  MessageCircle,
   Volume2,
-  Wind,
-  Zap,
 } from 'lucide-react';
 import { GameManager } from '../core/GameManager';
-import { InteractionPrompt } from '../types/game';
+import { InteractionPrompt, WeaponMode } from '../types/game';
 
 interface MobileControlsProps {
   gameRef: React.MutableRefObject<GameManager | null>;
   isDriving: boolean;
   activePrompt: InteractionPrompt | null;
   cricketActive: boolean;
+  weaponMode: WeaponMode;
+  ammo: number;
 }
 
 const FistIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M18 11V7a2 2 0 0 0-4 0v3" />
-    <path d="M14 10V6a2 2 0 0 0-4 0v4" />
-    <path d="M10 10V7a2 2 0 0 0-4 0v6a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-2a2 2 0 0 0-2-2Z" />
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M18.5 9.5a1.6 1.6 0 0 0-1.5 1.1V7.2a1.6 1.6 0 0 0-3.2 0v2.1V6a1.6 1.6 0 0 0-3.2 0v3.3V7.2a1.6 1.6 0 0 0-3.2 0v5.1l-.9-.9a1.5 1.5 0 0 0-2.1 2.1l3.3 3.8A4.8 4.8 0 0 0 11.4 19h3.4A4.6 4.6 0 0 0 19.4 14.4V11a1.6 1.6 0 0 0-.9-1.5Z" />
+  </svg>
+);
+
+const GunIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M3 7h15.5l1.2-1.5h1.3v3.5l-1.5 1H14v3.2a1 1 0 0 1-1 1h-2.1l-1.3 4.8H6l1.4-5.5H4.5L3 12V7Zm8.2 3v2.3h1.5V10h-1.5Z" />
+  </svg>
+);
+
+const JumpPersonIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="12" cy="4.2" r="2.1" />
+    <path d="M7.2 7.2 10.6 9h2.8l3.4-1.8 1 1.7-3.3 2v3.3l2.6 4.1-1.9 1-2.5-3.6h-1.4L8.8 19.3l-1.9-1 2.6-4.1V10.9l-3.3-2 1-1.7Z" />
+  </svg>
+);
+
+const RunPersonIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="14.5" cy="4.3" r="2.1" />
+    <path d="M13.6 7.5c.8 0 1.4.6 1.4 1.4l-.6 2.8 3 1.8-.9 1.6-2.8-1.4-1.2 2.4 2.7 3.8-1.8 1-2.6-3.4-2.1 1.7-1.2 3-1.8-.6 1.3-3.5 2.5-1.9 1.2-3.2-2.6.9-.9 2-1.7-.7 1.3-3.2 4.8-1.6Z" />
+  </svg>
+);
+
+const CrouchPersonIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="13.5" cy="6.5" r="2.1" />
+    <path d="M13.5 9.4c1.1 0 1.9.8 1.9 1.9v2.4l3 1.4-.7 1.8-3.8-1.4-2.6.2 1.2 3.8H9.8l-1.7-5.2 2.9-3.9c.5-.6 1.4-1 2.5-1Z" />
   </svg>
 );
 
 const BatIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M19 3 9 13l2 2L21 5l-2-2Z" />
     <path d="m9 13-5 5" />
     <circle cx="17" cy="17" r="2.2" />
@@ -52,6 +76,8 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
   isDriving,
   activePrompt,
   cricketActive,
+  weaponMode,
+  ammo,
 }) => {
   const [knob, setKnob] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [sprintActive, setSprintActive] = useState(false);
@@ -88,7 +114,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
 
   const updateJoy = (cx: number, cy: number) => {
     if (!joyOrigin.current) return;
-    const maxR = 40;
+    const maxR = 42;
     let dx = cx - joyOrigin.current.x;
     let dy = cy - joyOrigin.current.y;
     const dist = Math.hypot(dx, dy);
@@ -120,8 +146,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     }
   };
 
-  const iconBtn =
-    'flex flex-col items-center justify-center rounded-full border-2 border-white/25 bg-slate-950/70 text-white active:scale-90 transition-transform select-none touch-none shadow-lg';
+  // Screenshot-matched translucent dark circular button with white outline & crisp white icon
+  const actionCircle =
+    'flex flex-col items-center justify-center rounded-full border-2 border-white/80 bg-black/40 text-white active:scale-90 transition-transform select-none touch-none shadow-[0_3px_12px_rgba(0,0,0,0.45)]';
 
   return (
     <div
@@ -131,8 +158,8 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
       onPointerCancel={handleLookUp}
       className="fixed inset-0 z-10 pointer-events-auto"
     >
-      {/* Left Thumb Zone: Virtual Joystick or Vehicle Steering */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
+      {/* Left Thumb Zone: Screenshot-Matched Translucent White-Ringed Virtual Joystick */}
+      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-7">
         {isDriving ? (
           <div className="flex items-center gap-3">
             <button
@@ -147,7 +174,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ steer: 0 });
               }}
               onPointerLeave={() => setInput({ steer: 0 })}
-              className="flex h-14 w-16 items-center justify-center rounded-2xl border-2 border-white/25 bg-slate-950/80 text-white active:scale-95 active:border-amber-400 shadow-xl"
+              className="flex h-14 w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
             >
               <ArrowLeft className="h-7 w-7" />
             </button>
@@ -163,52 +190,43 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ steer: 0 });
               }}
               onPointerLeave={() => setInput({ steer: 0 })}
-              className="flex h-14 w-16 items-center justify-center rounded-2xl border-2 border-white/25 bg-slate-950/80 text-white active:scale-95 active:border-amber-400 shadow-xl"
+              className="flex h-14 w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
             >
               <ArrowRight className="h-7 w-7" />
             </button>
           </div>
         ) : (
-          <div className="flex items-end gap-3">
-            <div
-              onPointerDown={handleJoyDown}
-              onPointerMove={handleJoyMove}
-              onPointerUp={handleJoyUp}
-              onPointerCancel={handleJoyUp}
-              className="relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-white/25 bg-slate-950/50 touch-none shadow-inner"
-            >
-              {/* Directional cross notches */}
-              <div className="pointer-events-none absolute inset-3 rounded-full border border-white/10" />
-              <div
-                className="h-12 w-12 rounded-full border-2 border-amber-300/90 bg-gradient-to-b from-amber-400 to-amber-600 shadow-lg"
-                style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
-              />
-            </div>
+          <div
+            onPointerDown={handleJoyDown}
+            onPointerMove={handleJoyMove}
+            onPointerUp={handleJoyUp}
+            onPointerCancel={handleJoyUp}
+            className="relative flex h-[112px] w-[112px] sm:h-[124px] sm:w-[124px] items-center justify-center rounded-full border-2 border-white/75 bg-black/25 touch-none shadow-[0_2px_14px_rgba(0,0,0,0.45)]"
+          >
+            {/* 4 Directional White Triangles matching reference screenshot */}
+            <span className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 text-[10px] leading-none text-white/95">
+              ▲
+            </span>
+            <span className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] leading-none text-white/95">
+              ▼
+            </span>
+            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] leading-none text-white/95">
+              ◀
+            </span>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] leading-none text-white/95">
+              ▶
+            </span>
 
-            {/* Sprint Lock Toggle Icon next to Joystick (Free Fire style) */}
-            <button
-              type="button"
-              aria-label="Toggle Sprint"
-              title="Sprint"
-              onClick={(e) => {
-                e.stopPropagation();
-                const next = !sprintActive;
-                setSprintActive(next);
-                setInput({ sprint: next });
-              }}
-              className={`${iconBtn} h-11 w-11 ${
-                sprintActive
-                  ? 'border-amber-400 bg-amber-500/90 text-slate-950'
-                  : 'border-white/25'
-              }`}
-            >
-              <Zap className="h-5 w-5" />
-            </button>
+            {/* Center 3D Shaded White/Silver Joystick Knob */}
+            <div
+              className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white bg-gradient-to-b from-white via-slate-200 to-slate-400 shadow-[0_3px_10px_rgba(0,0,0,0.5)]"
+              style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
+            />
           </div>
         )}
       </div>
 
-      {/* Right Thumb Zone: Free Fire / GTA Style Professional Icon Controls */}
+      {/* Right Thumb Zone: Screenshot-Matched Circular Action Cluster */}
       <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
         {isDriving ? (
           <div className="flex items-end gap-2.5">
@@ -224,9 +242,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ horn: false });
               }}
-              className={`${iconBtn} h-12 w-12`}
+              className={`${actionCircle} h-12 w-12`}
             >
-              <Volume2 className="h-5 w-5 text-amber-300" />
+              <Volume2 className="h-5 w-5" />
             </button>
 
             <button
@@ -242,10 +260,10 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ brake: 0 });
               }}
               onPointerLeave={() => setInput({ brake: 0 })}
-              className="flex h-16 w-14 flex-col items-center justify-center rounded-2xl border-2 border-red-400/70 bg-red-950/85 text-red-200 active:scale-95 active:bg-red-700 shadow-xl"
+              className={`${actionCircle} h-14 w-14 border-red-300/85 bg-black/50`}
             >
-              <PedalIcon className="h-6 w-6" />
-              <span className="mt-0.5 text-[9px] font-bold tracking-wider">BRAKE</span>
+              <PedalIcon className="h-5 w-5" />
+              <span className="text-[8px] font-bold tracking-wider">BRAKE</span>
             </button>
 
             <button
@@ -261,10 +279,10 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ throttle: 0 });
               }}
               onPointerLeave={() => setInput({ throttle: 0 })}
-              className="flex h-20 w-16 flex-col items-center justify-center rounded-2xl border-2 border-emerald-400/80 bg-emerald-900/90 text-emerald-100 active:scale-95 active:bg-emerald-600 shadow-xl"
+              className={`${actionCircle} h-16 w-16 border-white bg-black/45`}
             >
-              <PedalIcon className="h-7 w-7" />
-              <span className="mt-0.5 text-[9px] font-bold tracking-wider">GAS</span>
+              <PedalIcon className="h-6 w-6" />
+              <span className="text-[8px] font-bold tracking-wider">GAS</span>
             </button>
 
             <button
@@ -275,14 +293,39 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ vehicleToggle: true });
               }}
-              className={`${iconBtn} h-12 w-12 border-amber-400/80 bg-amber-500 text-slate-950`}
+              className={`${actionCircle} h-12 w-12 border-amber-300 bg-amber-500/85 text-slate-950`}
             >
               <LogOut className="h-5 w-5" />
             </button>
           </div>
         ) : (
-          <div className="relative h-[168px] w-[196px]">
-            {/* Top-left of cluster: Sit */}
+          <div className="relative h-[168px] w-[205px] sm:h-[180px] sm:w-[222px]">
+            {/* Top-left: Weapon Switch (Fist <-> Gun) */}
+            <button
+              type="button"
+              aria-label="Switch Weapon (Fist or Gun)"
+              title={weaponMode === 'gun' ? 'Switch to Fist' : 'Switch to Gun'}
+              onClick={(e) => {
+                e.stopPropagation();
+                gameRef.current?.toggleWeaponMode();
+              }}
+              className={`${actionCircle} absolute top-2 left-0 h-11 w-11 ${
+                weaponMode === 'gun' ? 'border-amber-300 bg-black/60' : ''
+              }`}
+            >
+              {weaponMode === 'gun' ? (
+                <GunIcon className="h-5 w-5 text-amber-300" />
+              ) : (
+                <FistIcon className="h-5 w-5" />
+              )}
+              {weaponMode === 'gun' && (
+                <span className="font-mono-num -mt-0.5 text-[8px] font-bold text-amber-300">
+                  {ammo}
+                </span>
+              )}
+            </button>
+
+            {/* Top-middle: Sit */}
             <button
               type="button"
               aria-label="Sit"
@@ -291,26 +334,12 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ sitToggle: true });
               }}
-              className={`${iconBtn} absolute top-0 left-0 h-11 w-11`}
+              className={`${actionCircle} absolute top-0 left-14 h-11 w-11`}
             >
-              <Armchair className="h-5 w-5 text-slate-200" />
+              <Armchair className="h-5 w-5" />
             </button>
 
-            {/* Top-middle: Crouch */}
-            <button
-              type="button"
-              aria-label="Crouch"
-              title="Crouch"
-              onClick={(e) => {
-                e.stopPropagation();
-                setInput({ crouch: true });
-              }}
-              className={`${iconBtn} absolute top-0 left-14 h-11 w-11`}
-            >
-              <ArrowDownToLine className="h-5 w-5 text-slate-200" />
-            </button>
-
-            {/* Top-right: Jump */}
+            {/* Top-right: Jump (matches screenshot top-right jumping person circle) */}
             <button
               type="button"
               aria-label="Jump"
@@ -319,45 +348,12 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ jump: true });
               }}
-              className={`${iconBtn} absolute top-0 right-0 h-12 w-12 border-emerald-400/75 bg-emerald-950/85`}
+              className={`${actionCircle} absolute top-0 right-0 h-13 w-13 sm:h-14 sm:w-14`}
             >
-              <ArrowUpFromLine className="h-5 w-5 text-emerald-300" />
+              <JumpPersonIcon className="h-7 w-7" />
             </button>
 
-            {/* Middle-left: Block */}
-            <button
-              type="button"
-              aria-label="Block"
-              title="Block"
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                setInput({ block: true });
-              }}
-              onPointerUp={(e) => {
-                e.stopPropagation();
-                setInput({ block: false });
-              }}
-              onPointerLeave={() => setInput({ block: false })}
-              className={`${iconBtn} absolute top-14 left-0 h-11 w-11`}
-            >
-              <Shield className="h-5 w-5 text-sky-300" />
-            </button>
-
-            {/* Middle-center: Dodge */}
-            <button
-              type="button"
-              aria-label="Dodge"
-              title="Dodge"
-              onClick={(e) => {
-                e.stopPropagation();
-                setInput({ dodge: true });
-              }}
-              className={`${iconBtn} absolute top-14 left-14 h-11 w-11`}
-            >
-              <Wind className="h-5 w-5 text-cyan-300" />
-            </button>
-
-            {/* Bottom-left: Kick */}
+            {/* Middle-left: Kick */}
             <button
               type="button"
               aria-label="Kick"
@@ -366,12 +362,30 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ kick: true });
               }}
-              className={`${iconBtn} absolute bottom-0 left-0 h-12 w-12 border-orange-400/60`}
+              className={`${actionCircle} absolute top-14 left-0 h-11 w-11`}
             >
-              <Footprints className="h-5 w-5 text-orange-300" />
+              <Footprints className="h-5 w-5" />
             </button>
 
-            {/* Bottom-middle: Contextual Interact / Enter Vehicle / Cricket Bat */}
+            {/* Bottom-left: Run / Sprint Toggle (matches screenshot running person circle) */}
+            <button
+              type="button"
+              aria-label="Toggle Sprint"
+              title="Sprint"
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = !sprintActive;
+                setSprintActive(next);
+                setInput({ sprint: next });
+              }}
+              className={`${actionCircle} absolute bottom-0 left-7 h-12 w-12 sm:h-13 sm:w-13 ${
+                sprintActive ? 'border-amber-300 bg-amber-500/85 text-slate-950' : ''
+              }`}
+            >
+              <RunPersonIcon className="h-6 w-6" />
+            </button>
+
+            {/* Middle-center: Contextual Door / Talk / Drive / Bat Interact */}
             <button
               type="button"
               aria-label={
@@ -379,7 +393,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                   ? 'Swing Bat'
                   : activePrompt?.kind === 'vehicle'
                     ? 'Drive Vehicle'
-                    : 'Interact'
+                    : activePrompt?.kind === 'door'
+                      ? activePrompt.label
+                      : 'Interact'
               }
               title={activePrompt?.label ?? 'Interact'}
               onClick={(e) => {
@@ -390,41 +406,65 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                   setInput({ interact: true });
                 }
               }}
-              className={`${iconBtn} absolute bottom-0 left-14 h-12 w-12 ${
+              className={`${actionCircle} absolute top-14 left-14 h-12 w-12 ${
                 activePrompt || cricketActive
-                  ? 'border-amber-300 bg-amber-500 text-slate-950'
-                  : 'border-white/25 text-slate-300'
+                  ? 'border-amber-300 bg-amber-500/90 text-slate-950'
+                  : ''
               }`}
             >
               {cricketActive ? (
                 <BatIcon className="h-5 w-5" />
               ) : activePrompt?.kind === 'vehicle' ? (
                 <Car className="h-5 w-5" />
+              ) : activePrompt?.kind === 'door' ? (
+                <DoorOpen className="h-5 w-5" />
+              ) : activePrompt?.kind === 'npc' ? (
+                <MessageCircle className="h-5 w-5" />
               ) : (
                 <Hand className="h-5 w-5" />
               )}
             </button>
 
-            {/* Bottom-right Primary Action: Punch / Bat */}
+            {/* Primary Large Button: Punch (Fist) or Shoot (Gun) or Bat */}
             <button
               type="button"
-              aria-label="Punch"
-              title="Punch"
+              aria-label={weaponMode === 'gun' ? 'Shoot Gun' : 'Punch'}
+              title={weaponMode === 'gun' ? 'Shoot Gun (G)' : 'Punch (J)'}
               onClick={(e) => {
                 e.stopPropagation();
                 if (cricketActive) {
                   setInput({ interact: true });
+                } else if (weaponMode === 'gun') {
+                  setInput({ fireGun: true });
                 } else {
                   setInput({ punch: true });
                 }
               }}
-              className={`${iconBtn} absolute bottom-0 right-0 h-16 w-16 border-amber-400/85 bg-gradient-to-b from-amber-500/90 to-orange-600/90 text-white`}
+              className={`${actionCircle} absolute bottom-8 right-12 h-16 w-16 sm:h-[68px] sm:w-[68px] ${
+                weaponMode === 'gun' ? 'border-amber-300 bg-black/55' : ''
+              }`}
             >
               {cricketActive ? (
-                <BatIcon className="h-7 w-7" />
+                <BatIcon className="h-8 w-8" />
+              ) : weaponMode === 'gun' ? (
+                <GunIcon className="h-8 w-8 text-amber-300" />
               ) : (
-                <FistIcon className="h-7 w-7" />
+                <FistIcon className="h-8 w-8" />
               )}
+            </button>
+
+            {/* Bottom-right corner: Crouch (matches screenshot crouching person circle) */}
+            <button
+              type="button"
+              aria-label="Crouch"
+              title="Crouch"
+              onClick={(e) => {
+                e.stopPropagation();
+                setInput({ crouch: true });
+              }}
+              className={`${actionCircle} absolute bottom-0 right-0 h-12 w-12 sm:h-13 sm:w-13`}
+            >
+              <CrouchPersonIcon className="h-6 w-6" />
             </button>
           </div>
         )}

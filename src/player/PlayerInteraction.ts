@@ -1,3 +1,4 @@
+import { DoorInteractable } from '../buildings/HouseModels';
 import { SitSpot } from '../buildings/InteriorSystem';
 import { InteractionPrompt } from '../types/game';
 import { VehicleEntity } from '../vehicles/VehicleController';
@@ -15,6 +16,7 @@ export class PlayerInteraction {
     pz: number,
     vehicles: VehicleEntity[],
     npcs: NpcInteractable[],
+    doors: DoorInteractable[],
     sitSpots: SitSpot[],
     isDriving: boolean,
     cricketActive: boolean
@@ -22,6 +24,7 @@ export class PlayerInteraction {
     prompt: InteractionPrompt | null;
     nearestVehicle: VehicleEntity | null;
     nearestNpc: NpcInteractable | null;
+    nearestDoor: DoorInteractable | null;
     nearestSit: SitSpot | null;
     nearCricket: boolean;
     nearFootball: boolean;
@@ -31,6 +34,33 @@ export class PlayerInteraction {
         prompt: { id: 'exit-veh', label: 'Exit Vehicle', kind: 'vehicle' },
         nearestVehicle: null,
         nearestNpc: null,
+        nearestDoor: null,
+        nearestSit: null,
+        nearCricket: false,
+        nearFootball: false,
+      };
+    }
+
+    // House Doors (high priority when right next to entrance)
+    let nearestDoor: DoorInteractable | null = null;
+    let doorDist = 2.6;
+    for (const d of doors) {
+      const dist = Math.hypot(d.worldX - px, d.worldZ - pz);
+      if (dist < doorDist) {
+        doorDist = dist;
+        nearestDoor = d;
+      }
+    }
+    if (nearestDoor) {
+      return {
+        prompt: {
+          id: nearestDoor.id,
+          label: nearestDoor.isOpen ? 'Close Door' : 'Open Door',
+          kind: 'door',
+        },
+        nearestVehicle: null,
+        nearestNpc: null,
+        nearestDoor,
         nearestSit: null,
         nearCricket: false,
         nearFootball: false,
@@ -51,39 +81,39 @@ export class PlayerInteraction {
         prompt: { id: nearestVehicle.id, label: `Drive ${nearestVehicle.label}`, kind: 'vehicle' },
         nearestVehicle,
         nearestNpc: null,
+        nearestDoor: null,
         nearestSit: null,
         nearCricket: false,
         nearFootball: false,
       };
     }
 
-    // Cricket Pitch near (18, 58..75)
     const distCricket = Math.hypot(px - 18, pz - 74);
     if (distCricket < 7.5 && !cricketActive) {
       return {
         prompt: { id: 'cricket-pitch', label: 'Play Village Cricket', kind: 'cricket' },
         nearestVehicle: null,
         nearestNpc: null,
+        nearestDoor: null,
         nearestSit: null,
         nearCricket: true,
         nearFootball: false,
       };
     }
 
-    // Football Pitch near (-34, 88)
     const distFootball = Math.hypot(px - -34, pz - 88);
     if (distFootball < 18) {
       return {
         prompt: { id: 'football-pitch', label: 'Kick Football', kind: 'football' },
         nearestVehicle: null,
         nearestNpc: null,
+        nearestDoor: null,
         nearestSit: null,
         nearCricket: false,
         nearFootball: true,
       };
     }
 
-    // Sit spots (benches / charpoi)
     let nearestSit: SitSpot | null = null;
     let sitDist = 2.6;
     for (const s of sitSpots) {
@@ -98,15 +128,15 @@ export class PlayerInteraction {
         prompt: { id: nearestSit.id, label: nearestSit.label, kind: 'sit' },
         nearestVehicle: null,
         nearestNpc: null,
+        nearestDoor: null,
         nearestSit,
         nearCricket: false,
         nearFootball: false,
       };
     }
 
-    // NPCs
     let nearestNpc: NpcInteractable | null = null;
-    let npcDist = 3.4;
+    let npcDist = 3.5;
     for (const n of npcs) {
       const d = Math.hypot(n.x - px, n.z - pz);
       if (d < npcDist) {
@@ -119,6 +149,7 @@ export class PlayerInteraction {
         prompt: { id: nearestNpc.id, label: `Talk to ${nearestNpc.name}`, kind: 'npc' },
         nearestVehicle: null,
         nearestNpc,
+        nearestDoor: null,
         nearestSit: null,
         nearCricket: false,
         nearFootball: false,
@@ -129,6 +160,7 @@ export class PlayerInteraction {
       prompt: null,
       nearestVehicle: null,
       nearestNpc: null,
+      nearestDoor: null,
       nearestSit: null,
       nearCricket: false,
       nearFootball: false,

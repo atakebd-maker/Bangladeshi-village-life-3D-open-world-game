@@ -14,6 +14,7 @@ import { PlayerController } from '../player/PlayerController';
 import { PlayerInteraction } from '../player/PlayerInteraction';
 import {
   CameraMode,
+  DialogueChoice,
   GameSettings,
   GraphicsQuality,
   HudSnapshot,
@@ -21,6 +22,7 @@ import {
   PlayerOutfit,
   SaveData,
 } from '../types/game';
+import { TrafficSystem } from '../vehicles/TrafficSystem';
 import { VehicleEntity } from '../vehicles/VehicleController';
 import { spawnVillageVehicles } from '../vehicles/VehicleInteraction';
 import { DayNightSystem } from '../world/DayNightSystem';
@@ -65,6 +67,7 @@ export class GameManager {
     jump: false,
     crouch: false,
     punch: false,
+    fireGun: false,
     kick: false,
     block: false,
     dodge: false,
@@ -87,6 +90,7 @@ export class GameManager {
   private village: VillageMap;
   private player: PlayerController;
   private vehicles: VehicleEntity[];
+  private traffic: TrafficSystem;
   private npcs: NPCController;
   private animals: AnimalAI;
   private cricket: CricketSystem;
@@ -105,6 +109,11 @@ export class GameManager {
   private disposed = false;
   private hudTimer = 0;
   private saveTimer = 0;
+  private isDead = false;
+  private deathReason = '';
+  private deathTimer = 0;
+  private gunTracerMesh: THREE.Mesh;
+  private gunTracerTimer = 0;
   private onHudUpdate: (snap: HudSnapshot) => void;
   private onContextLost: (lost: boolean) => void;
 
@@ -115,6 +124,7 @@ export class GameManager {
   private keySitQueued = false;
   private keyCrouchQueued = false;
   private keyJumpQueued = false;
+  private keyFireQueued = false;
 
   constructor(
     container: HTMLElement,
@@ -190,11 +200,14 @@ export class GameManager {
     this.village = new VillageMap(this.textures);
     this.scene.add(this.village.group);
 
-    loader.report(78, 'Spawning vehicles, villagers & animals...');
+    loader.report(78, 'Spawning vehicles, traffic, villagers & animals...');
     this.vehicles = spawnVillageVehicles(this.textures);
     for (const v of this.vehicles) {
       this.scene.add(v.group);
     }
+
+    this.traffic = new TrafficSystem(this.textures);
+    this.scene.add(this.traffic.group);
 
     this.npcs = new NPCController(this.textures);
     this.scene.add(this.npcs.group);
@@ -217,6 +230,24 @@ export class GameManager {
       initialSave.inventory
     );
     this.scene.add(this.player.rig.root);
+
+    // Muzzle tracer beam for gunshots
+    const tracerGeo = new THREE.CylinderGeometry(0.025, 0.025, 20, 6);
+    tracerGeo.rotateX(Math.PI / 2);
+    tracerGeo.translate(0, 0, 10);
+    this.gunTracerMesh = new THREE.Mesh(
+      tracerGeo,
+      new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.9 })
+    );
+    this.gunTracerMesh.visible = false;
+    this.scene.add(this.gunTracerMesh);
+
+    this.thirdCam.resetBehind(
+      this.player.x,
+      this.player.y,
+      this.player.z,
+      this.player.rotationY
+    );
 
     this.applyGraphicsPreset(this.settings.graphics);
 
@@ -251,6 +282,8 @@ export class GameManager {
     if (k === 'KeyV') this.keySitQueued = true;
     if (k === 'KeyC') this.keyCrouchQueued = true;
     if (k === 'Space') this.keyJumpQueued = true;
+    if (k === 'KeyG') this.keyFireQueued = true;
+    if (k === 'KeyR' || k === 'Digit1') this.toggleWeaponMode();
     if (k === 'Tab') {
       e.preventDefault();
       this.toggleCameraMode();
@@ -317,17 +350,83 @@ export class GameManager {
     }
   }
 
+  public toggleWeaponMode(): void {
+    this.player.combat.toggleWeapon();
+    this.audio.playUiClick();
+  }
+
+  public selectDialogueChoice(choice: DialogueChoice): void {
+    this.interaction.selectDialogueChoice(choice, this.player, this.missions, this.audio);
+  }
+
+  public closeDialogue(): void {
+    this.interaction.closeDialogue();
+    this.audio.playUiClick();
+  }
+
+  public respawnPlayer(): void {
+    this.isDead = false;
+    this.deathReason = '';
+    this.deathTimer = 0;
+    this.player.health = 100;
+    this.player.stamina = 100;
+    this.player.x = 0;
+    this.player.y = groundHeightAt(0, 8);
+    this.player.z = 8;
+    this.player.vy = 0;
+    this.player.speed = 0;
+    this.player.rotationY = 0;
+    this.player.posture = 'standing';
+    this.player.drivingVehicleId = null;
+    this.player.rig.root.visible = true;
+    this.player.rig.bodyPivot.rotation.x = 0;
+    this.player.rig.bodyPivot.position.y = 0;
+    this.interaction.closeDialogue();
+    this.cricket.stopMatch();
+    this.thirdCam.resetBehind(this.player.x, this.player.y, this.player.z, this.player.rotationY);
+    this.audio.playUiClick();
+  }
+
+  private handlePlayerDamaged(dmg: number): void {
+    if (this.isDead) return;
+    this.player.takeDamage(dmg, this.audio);
+    if (this.player.health <= 0) {
+      this.handlePlayerKilled('Knocked out in village brawl');
+    }
+  }
+
+  private handlePlayerKilled(reason: string): void {
+    if (this.isDead) return;
+    this.isDead = true;
+    this.deathReason = reason;
+    this.deathTimer = 2.6;
+    this.player.health = 0;
+    this.player.speed = 0;
+    this.player.rig.bodyPivot.rotation.x = Math.PI / 2;
+    this.player.rig.bodyPivot.position.y = 0.2;
+    this.interaction.closeDialogue();
+    this.audio.playImpactHit(true);
+  }
+
   public resetFromSave(save: SaveData): void {
     this.saveData = save;
+    this.isDead = false;
+    this.deathReason = '';
+    this.deathTimer = 0;
+    this.player.health = 100;
+    this.player.stamina = 100;
     this.player.x = save.playerPosition[0];
     this.player.y = save.playerPosition[1];
     this.player.z = save.playerPosition[2];
     this.player.rotationY = save.playerRotationY;
     this.player.drivingVehicleId = null;
     this.player.rig.root.visible = true;
+    this.player.rig.bodyPivot.rotation.x = 0;
+    this.player.rig.bodyPivot.position.y = 0;
     this.player.setOutfit(save.outfit);
     this.missions = new MissionSystem(save.completedMissionIds);
     this.cricket.stopMatch();
+    this.thirdCam.resetBehind(this.player.x, this.player.y, this.player.z, this.player.rotationY);
     this.applySettings(save.settings);
   }
 
@@ -423,6 +522,10 @@ export class GameManager {
       this.input.interact = true;
       this.keyInteractQueued = false;
     }
+    if (this.keyFireQueued) {
+      this.input.fireGun = true;
+      this.keyFireQueued = false;
+    }
   }
 
   private clearOneShotInputs(): void {
@@ -432,6 +535,7 @@ export class GameManager {
     this.input.sitToggle = false;
     this.input.vehicleToggle = false;
     this.input.interact = false;
+    this.input.fireGun = false;
     if (!this.keys.has('KeyJ')) this.input.punch = false;
     if (!this.keys.has('KeyK')) this.input.kick = false;
     if (!this.keys.has('KeyL')) this.input.block = false;
@@ -490,6 +594,13 @@ export class GameManager {
 
     this.mergeKeyboardIntoInput();
 
+    if (this.gunTracerTimer > 0) {
+      this.gunTracerTimer -= dt;
+      if (this.gunTracerTimer <= 0) {
+        this.gunTracerMesh.visible = false;
+      }
+    }
+
     const activeVeh = this.player.drivingVehicleId
       ? this.vehicles.find((v) => v.id === this.player.drivingVehicleId) ?? null
       : null;
@@ -503,59 +614,86 @@ export class GameManager {
       this.player.z,
       this.vehicles,
       this.npcs.npcs,
+      this.village.doors,
       this.village.sitSpots,
       Boolean(activeVeh),
       this.cricket.state.active
     );
 
-    if (this.input.vehicleToggle) {
-      this.interaction.handleVehicleToggle(
-        this.player,
-        this.vehicles,
-        prox.nearestVehicle,
-        this.missions,
-        this.audio
-      );
-    }
-
-    if (this.input.interact) {
-      this.interaction.handlePrimaryInteract(
-        this.player,
-        this.npcs,
-        prox.nearestNpc,
-        prox.nearestSit,
-        prox.nearCricket,
-        prox.nearFootball,
-        this.cricket,
-        this.football,
-        this.missions,
-        this.audio
-      );
-    }
-
-    // Update Player or Vehicle
-    if (activeVeh) {
-      activeVeh.update(dt, this.input, this.village.colliders, this.dayNight.isNight());
-      this.player.x = activeVeh.x;
-      this.player.y = activeVeh.y + activeVeh.spec.seatOffset[1] - 0.35;
-      this.player.z = activeVeh.z;
-      this.player.rotationY = activeVeh.rotationY;
-      this.player.rig.root.position.set(this.player.x, this.player.y, this.player.z);
-      this.player.rig.root.rotation.y = activeVeh.rotationY;
-      this.player.rig.root.visible =
-        activeVeh.kind === 'motorcycle' ||
-        activeVeh.kind === 'sports_bike' ||
-        activeVeh.kind === 'bicycle' ||
-        activeVeh.kind === 'cycle_rickshaw';
+    if (this.isDead) {
+      this.deathTimer -= dt;
+      if (this.deathTimer <= 0) {
+        this.respawnPlayer();
+      }
     } else {
-      this.player.update(
-        dt,
-        this.input,
-        camYaw,
-        this.village.colliders,
-        this.village.treeTrunks,
-        this.audio
-      );
+      if (this.input.vehicleToggle) {
+        this.interaction.handleVehicleToggle(
+          this.player,
+          this.vehicles,
+          prox.nearestVehicle,
+          this.missions,
+          this.audio
+        );
+      }
+
+      if (this.input.interact) {
+        this.interaction.handlePrimaryInteract(
+          this.player,
+          this.npcs,
+          prox.nearestDoor,
+          prox.nearestNpc,
+          prox.nearestSit,
+          prox.nearCricket,
+          prox.nearFootball,
+          this.cricket,
+          this.football,
+          this.audio
+        );
+      }
+
+      // Update Player or Vehicle
+      if (activeVeh) {
+        activeVeh.update(dt, this.input, this.village.colliders, this.dayNight.isNight());
+        this.player.x = activeVeh.x;
+        this.player.y = activeVeh.y + activeVeh.spec.seatOffset[1] - 0.35;
+        this.player.z = activeVeh.z;
+        this.player.rotationY = activeVeh.rotationY;
+        this.player.rig.root.position.set(this.player.x, this.player.y, this.player.z);
+        this.player.rig.root.rotation.y = activeVeh.rotationY;
+        this.player.rig.root.visible =
+          activeVeh.kind === 'motorcycle' ||
+          activeVeh.kind === 'sports_bike' ||
+          activeVeh.kind === 'bicycle' ||
+          activeVeh.kind === 'cycle_rickshaw';
+      } else {
+        const { meleeHit, gunFired } = this.player.update(
+          dt,
+          this.input,
+          camYaw,
+          this.village.colliders,
+          this.village.treeTrunks,
+          this.audio
+        );
+        if (gunFired) {
+          this.gunTracerMesh.position.set(
+            this.player.x + Math.sin(this.player.rotationY) * 0.45,
+            this.player.y + 1.24,
+            this.player.z + Math.cos(this.player.rotationY) * 0.45
+          );
+          this.gunTracerMesh.rotation.y = this.player.rotationY;
+          this.gunTracerMesh.visible = true;
+          this.gunTracerTimer = 0.09;
+        }
+        if (meleeHit || gunFired) {
+          this.npcs.applyPlayerAttack(
+            this.player.x,
+            this.player.z,
+            this.player.rotationY,
+            gunFired,
+            this.audio
+          );
+        }
+      }
     }
 
     // Update idle vehicles gently
@@ -565,19 +703,34 @@ export class GameManager {
       }
     }
 
+    // Update autonomous road traffic (lethal on foot collision)
+    this.traffic.update(
+      dt,
+      this.player.x,
+      this.player.z,
+      Boolean(activeVeh),
+      this.dayNight.isNight(),
+      (vehLabel) => this.handlePlayerKilled(`Hit by ${vehLabel}`)
+    );
+
     // Update NPCs, Animals, Sports, World Atmosphere
-    this.npcs.update(dt, this.player.x, this.player.z, this.vehicles);
+    this.npcs.update(dt, this.player.x, this.player.z, this.vehicles, (dmg) =>
+      this.handlePlayerDamaged(dmg)
+    );
     this.animals.update(dt, elapsed, this.player.x, this.player.z);
     this.cricket.update(dt, this.audio);
     this.football.update(dt, this.player.x, this.player.z, this.player.speed);
-    this.interaction.update(dt);
+    this.interaction.update(dt, this.village.doors, this.player.x, this.player.z);
 
     // Check positional missions
-    if (this.cricket.state.runs >= 6) {
-      this.missions.complete('mission-cricket');
+    if (this.cricket.state.runs >= 6 && this.missions.complete('mission-cricket')) {
+      this.audio.playMissionComplete();
     }
-    if (Math.hypot(this.player.x - -14, this.player.z - -84) < 15) {
-      this.missions.complete('mission-bridge');
+    if (
+      Math.hypot(this.player.x - -14, this.player.z - -84) < 15 &&
+      this.missions.complete('mission-bridge')
+    ) {
+      this.audio.playMissionComplete();
     }
 
     // Weather & Day-Night
@@ -614,6 +767,7 @@ export class GameManager {
         this.player.x,
         this.player.y,
         this.player.z,
+        this.player.rotationY,
         Boolean(activeVeh),
         speedKmh
       );
@@ -658,7 +812,12 @@ export class GameManager {
         playerX: this.player.x,
         playerZ: this.player.z,
         playerHeading: this.player.rotationY,
+        health: Math.round(this.player.health),
         stamina: this.player.stamina,
+        weaponMode: this.player.combat.weaponMode,
+        ammo: this.player.combat.ammo,
+        isDead: this.isDead,
+        deathReason: this.deathReason,
         isDriving: Boolean(activeVeh),
         vehicleName: activeVeh ? activeVeh.label : '',
         speedKmh: Math.round(speedKmh),

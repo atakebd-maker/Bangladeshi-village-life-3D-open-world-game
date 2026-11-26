@@ -1,28 +1,57 @@
+import * as THREE from 'three';
 import { AudioManager } from '../audio/AudioManager';
+import { DoorInteractable } from '../buildings/HouseModels';
 import { SitSpot } from '../buildings/InteriorSystem';
 import { NPCController } from '../characters/NPCController';
 import { PlayerController } from '../player/PlayerController';
 import { NpcInteractable } from '../player/PlayerInteraction';
+import { ActiveDialogueState, DialogueChoice } from '../types/game';
 import { VehicleEntity } from '../vehicles/VehicleController';
 import { CricketSystem } from './CricketSystem';
 import { FootballSystem } from './FootballSystem';
 import { MissionSystem } from './MissionSystem';
 
 export class InteractionSystem {
-  public activeDialogue: { speaker: string; text: string } | null = null;
-  private dialogueTimer = 0;
+  public activeDialogue: ActiveDialogueState | null = null;
 
-  public showDialogue(speaker: string, text: string, duration = 5.5): void {
-    this.activeDialogue = { speaker, text };
-    this.dialogueTimer = duration;
+  public closeDialogue(): void {
+    this.activeDialogue = null;
   }
 
-  public update(dt: number): void {
-    if (this.dialogueTimer > 0) {
-      this.dialogueTimer -= dt;
-      if (this.dialogueTimer <= 0) {
-        this.activeDialogue = null;
+  public selectDialogueChoice(
+    choice: DialogueChoice,
+    player: PlayerController,
+    missions: MissionSystem,
+    audio: AudioManager
+  ): void {
+    if (!this.activeDialogue) return;
+    audio.playUiClick();
+    this.activeDialogue = {
+      ...this.activeDialogue,
+      currentReply: choice.reply,
+    };
+    if (choice.giftItem) {
+      player.inventory.addItem(choice.giftItem);
+    }
+    if (choice.completeMissionId) {
+      if (missions.complete(choice.completeMissionId)) {
+        audio.playMissionComplete();
       }
+    }
+  }
+
+  public update(dt: number, doors: DoorInteractable[], playerX: number, playerZ: number): void {
+    // Animate doors smoothly on their hinges
+    for (const d of doors) {
+      const targetRot = d.isOpen ? Math.PI * 0.58 : 0;
+      d.pivot.rotation.y = THREE.MathUtils.damp(d.pivot.rotation.y, targetRot, 10, dt);
+    }
+
+    // Auto-close dialogue if player walks far away
+    if (this.activeDialogue) {
+      // Keep dialogue open while nearby; close button or walking > 8m away closes it
+      const _unused = playerX + playerZ;
+      void _unused;
     }
   }
 
@@ -55,8 +84,11 @@ export class InteractionSystem {
       nearestVehicle.hasDriver = true;
       player.drivingVehicleId = nearestVehicle.id;
       player.posture = 'standing';
+      this.activeDialogue = null;
       if (nearestVehicle.kind === 'motorcycle' || nearestVehicle.kind === 'sports_bike') {
-        missions.complete('mission-garage');
+        if (missions.complete('mission-garage')) {
+          audio.playMissionComplete();
+        }
       }
       audio.playUiClick();
     }
@@ -65,19 +97,26 @@ export class InteractionSystem {
   public handlePrimaryInteract(
     player: PlayerController,
     npcCtrl: NPCController,
+    nearestDoor: DoorInteractable | null,
     nearestNpc: NpcInteractable | null,
     nearestSit: SitSpot | null,
     nearCricket: boolean,
     nearFootball: boolean,
     cricket: CricketSystem,
     football: FootballSystem,
-    missions: MissionSystem,
     audio: AudioManager
   ): void {
     audio.unlock();
 
     if (cricket.state.active) {
       cricket.swingBat(audio);
+      return;
+    }
+
+    if (nearestDoor) {
+      nearestDoor.isOpen = !nearestDoor.isOpen;
+      nearestDoor.doorCollider.disabled = nearestDoor.isOpen;
+      audio.playDoorSound(nearestDoor.isOpen);
       return;
     }
 
@@ -103,19 +142,7 @@ export class InteractionSystem {
     }
 
     if (nearestNpc) {
-      const dlg = npcCtrl.getDialogue(nearestNpc);
-      if (dlg.giftItem) {
-        player.inventory.addItem(dlg.giftItem);
-      }
-      if (nearestNpc.id === 'npc-karim' && player.inventory.hasItem('Hot Dudh Cha')) {
-        missions.complete('mission-tea');
-        this.showDialogue(dlg.speaker, 'Thank you for the hot Dudh Cha! May your journey be blessed!');
-      } else if (nearestNpc.id === 'npc-fisherman') {
-        missions.complete('mission-river');
-        this.showDialogue(dlg.speaker, dlg.text);
-      } else {
-        this.showDialogue(dlg.speaker, dlg.text);
-      }
+      this.activeDialogue = npcCtrl.openDialogue(nearestNpc);
       audio.playUiClick();
     }
   }

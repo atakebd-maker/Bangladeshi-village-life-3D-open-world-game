@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { TextureLibrary } from '../materials/ProceduralTextures';
-import { BoxCollider, HouseModels } from '../buildings/HouseModels';
+import { BoxCollider, DoorInteractable, HouseModels } from '../buildings/HouseModels';
 import { MarketModels } from '../buildings/MarketModels';
 import { SchoolModels } from '../buildings/SchoolModels';
 import { InteriorSystem, SitSpot } from '../buildings/InteriorSystem';
@@ -10,6 +10,7 @@ import { groundHeightAt, riverBankX } from './TerrainSystem';
 export class VillageMap {
   public readonly group = new THREE.Group();
   public readonly colliders: BoxCollider[] = [];
+  public readonly doors: DoorInteractable[] = [];
   public readonly sitSpots: SitSpot[] = [];
   public readonly markers: MiniMapMarker[] = [];
   public readonly treeTrunks: Array<{ x: number; z: number; r: number }> = [];
@@ -36,8 +37,8 @@ export class VillageMap {
 
   private buildHomesteads(textures: TextureLibrary): void {
     // 1. North-West Main Tin-Roof Homestead (Player Home Area)
-    this.group.add(HouseModels.createVillageHouse('tin', -16, -10, 0.08, textures, this.colliders, 'green'));
-    this.group.add(HouseModels.createVillageHouse('bamboo', -26, -15, Math.PI / 2, textures, this.colliders));
+    this.group.add(HouseModels.createVillageHouse('door-home-main', 'tin', -16, -10, 0.08, textures, this.colliders, this.doors, 'green'));
+    this.group.add(HouseModels.createVillageHouse('door-home-bam', 'bamboo', -26, -15, Math.PI / 2, textures, this.colliders, this.doors));
     this.group.add(HouseModels.createTubeWell(-10, -4));
     this.group.add(HouseModels.createOutdoorKitchen(-21, -5, textures));
     this.group.add(HouseModels.createHaystack(-30, -4));
@@ -46,18 +47,18 @@ export class VillageMap {
     this.addMarker('home', 'Homestead', -16, -10, '#22c55e', 'building');
 
     // 2. South-West Mud & Tin Homestead
-    this.group.add(HouseModels.createVillageHouse('mud', -26, 48, 0, textures, this.colliders, 'red'));
-    this.group.add(HouseModels.createVillageHouse('tin', -36, 54, Math.PI / 2, textures, this.colliders, 'silver'));
+    this.group.add(HouseModels.createVillageHouse('door-sw-mud', 'mud', -26, 48, 0, textures, this.colliders, this.doors, 'red'));
+    this.group.add(HouseModels.createVillageHouse('door-sw-tin', 'tin', -36, 54, Math.PI / 2, textures, this.colliders, this.doors, 'silver'));
     this.group.add(HouseModels.createTubeWell(-20, 44));
     this.group.add(HouseModels.createHaystack(-38, 44));
     this.group.add(HouseModels.createFenceRun(-42, 60, -18, 60, 'tin', textures));
 
     // 3. North-Central Brick Homestead
-    this.group.add(HouseModels.createVillageHouse('brick', -12, -56, 0, textures, this.colliders));
+    this.group.add(HouseModels.createVillageHouse('door-nc-brick', 'brick', -12, -56, 0, textures, this.colliders, this.doors));
     this.group.add(HouseModels.createTubeWell(-4, -52));
 
     // 4. East Homestead
-    this.group.add(HouseModels.createVillageHouse('tin', 34, -58, Math.PI, textures, this.colliders, 'red'));
+    this.group.add(HouseModels.createVillageHouse('door-east-tin', 'tin', 34, -58, Math.PI, textures, this.colliders, this.doors, 'red'));
     this.group.add(HouseModels.createOutdoorKitchen(28, -54, textures));
     this.group.add(HouseModels.createHaystack(42, -54));
   }

@@ -14,7 +14,12 @@ const INITIAL_HUD: HudSnapshot = {
   playerX: 0,
   playerZ: 8,
   playerHeading: 0,
+  health: 100,
   stamina: 100,
+  weaponMode: 'fist',
+  ammo: 30,
+  isDead: false,
+  deathReason: '',
   isDriving: false,
   vehicleName: '',
   speedKmh: 0,
@@ -148,10 +153,17 @@ export default function App() {
   };
 
   const handleExit = () => {
+    gameRef.current?.persistSave();
+    gameRef.current?.setPlayingMode(false);
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     }
-    setScreen('intro');
+    try {
+      window.close();
+    } catch {
+      // Browsers prevent closing non-scripted tabs; show clean exited screen
+    }
+    setScreen('exited');
   };
 
   return (
@@ -213,7 +225,29 @@ export default function App() {
             setInitialSave(SaveManager.load());
             setScreen('menu');
           }}
+          onExitGame={handleExit}
         />
+      )}
+
+      {screen === 'exited' && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black p-6 text-center">
+          <p className="text-xs font-bold tracking-[0.35em] text-amber-400 uppercase">
+            TAHSIN STUDIO
+          </p>
+          <h1 className="font-display mt-3 text-2xl font-bold text-white sm:text-4xl">
+            BANGLADESH VILLAGE LIFE 3D
+          </h1>
+          <p className="mt-3 max-w-sm text-xs text-slate-300">
+            Progress saved. Thank you for exploring Shonargaon Village!
+          </p>
+          <button
+            type="button"
+            onClick={() => setScreen('menu')}
+            className="mt-6 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-bold text-slate-950 shadow-lg hover:bg-emerald-400"
+          >
+            Relaunch Game
+          </button>
+        </div>
       )}
 
       {settingsOpen && (

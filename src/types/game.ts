@@ -1,4 +1,4 @@
-export type GameScreenState = 'intro' | 'menu' | 'loading' | 'playing';
+export type GameScreenState = 'intro' | 'menu' | 'loading' | 'playing' | 'exited';
 
 export type GraphicsQuality = 'low' | 'medium' | 'high' | 'ultra';
 
@@ -19,6 +19,8 @@ export type WeatherPreset =
   | 'fog';
 
 export type PlayerOutfit = 'lungi_genji' | 'panjabi_pajama' | 'shirt_pant';
+
+export type WeaponMode = 'fist' | 'gun';
 
 export type VehicleKind =
   | 'motorcycle'
@@ -99,6 +101,21 @@ export interface InteractionPrompt {
   kind: 'vehicle' | 'npc' | 'cricket' | 'football' | 'sit' | 'door' | 'item';
 }
 
+export interface DialogueChoice {
+  label: string;
+  reply: string;
+  giftItem?: string;
+  completeMissionId?: string;
+}
+
+export interface ActiveDialogueState {
+  npcId: string;
+  speaker: string;
+  greeting: string;
+  currentReply: string | null;
+  choices: DialogueChoice[];
+}
+
 export interface MiniMapMarker {
   id: string;
   label: string;
@@ -113,14 +130,19 @@ export interface HudSnapshot {
   playerX: number;
   playerZ: number;
   playerHeading: number;
+  health: number;
   stamina: number;
+  weaponMode: WeaponMode;
+  ammo: number;
+  isDead: boolean;
+  deathReason: string;
   isDriving: boolean;
   vehicleName: string;
   speedKmh: number;
   cameraMode: CameraMode;
   posture: 'standing' | 'crouching' | 'sitting' | 'climbing';
   activePrompt: InteractionPrompt | null;
-  dialogue: { speaker: string; text: string } | null;
+  dialogue: ActiveDialogueState | null;
   activeMission: MissionItem | null;
   completedCount: number;
   totalMissions: number;
@@ -142,6 +164,7 @@ export interface InputState {
   jump: boolean;
   crouch: boolean;
   punch: boolean;
+  fireGun: boolean;
   kick: boolean;
   block: boolean;
   dodge: boolean;

@@ -21,6 +21,7 @@ export class PlayerController {
   public vy = 0;
   public rotationY = 0;
   public speed = 0;
+  public health = 100;
   public stamina = 100;
   public isGrounded = true;
   public posture: 'standing' | 'crouching' | 'sitting' | 'climbing' = 'standing';
@@ -52,6 +53,7 @@ export class PlayerController {
       pantsHex: 0x1e293b,
       hasLungi: outfit === 'lungi_genji',
       hasPanjabi: outfit === 'panjabi_pajama',
+      hasGamcha: outfit !== 'shirt_pant',
     });
     this.animation.applyOutfit(this.rig, outfit, textures);
     this.rig.root.position.set(this.x, this.y, this.z);
@@ -82,6 +84,14 @@ export class PlayerController {
     }
   }
 
+  public takeDamage(amount: number, audio: AudioManager): void {
+    if (this.combat.action === 'block') {
+      amount *= 0.25;
+    }
+    this.health = Math.max(0, this.health - amount);
+    audio.playImpactHit(amount > 25);
+  }
+
   private sampleSurfaceHeight(x: number, z: number): number {
     // Bamboo bridge deck at x in [10.4, 13.6], z in [-45, -31]
     if (x >= 10.4 && x <= 13.6 && z >= -45 && z <= -31) {
@@ -102,14 +112,14 @@ export class PlayerController {
     colliders: BoxCollider[],
     trees: Array<{ x: number; z: number; r: number }>,
     audio: AudioManager
-  ): void {
+  ): { meleeHit: boolean; gunFired: boolean } {
     if (this.drivingVehicleId) {
       this.speed = 0;
-      this.animation.update(this.rig, dt, 0, true, 'standing', 'none', 0, true);
-      return;
+      this.animation.update(this.rig, dt, 0, true, 'standing', 'none', 0, true, false);
+      return { meleeHit: false, gunFired: false };
     }
 
-    const { dodgeBoost } = this.combat.update(dt, input, audio);
+    const { dodgeBoost, meleeHit, gunFired } = this.combat.update(dt, input, audio);
 
     if (input.sitToggle) {
       this.toggleSit(this.sittingSpot);
@@ -121,8 +131,8 @@ export class PlayerController {
       } else {
         this.rig.root.position.set(this.x, this.y, this.z);
         this.rig.root.rotation.y = this.rotationY;
-        this.animation.update(this.rig, dt, 0, true, 'sitting', 'none', 0, false);
-        return;
+        this.animation.update(this.rig, dt, 0, true, 'sitting', 'none', 0, false, false);
+        return { meleeHit, gunFired };
       }
     }
 
@@ -139,10 +149,9 @@ export class PlayerController {
     }
 
     const maxSpeed =
-      this.posture === 'crouching' ? 2.6 : wantsSprint ? 9.2 : 5.4;
+      this.posture === 'crouching' ? 2.6 : wantsSprint ? 9.4 : 5.6;
 
     if (moveMag > 0.05 || dodgeBoost) {
-      // Camera-relative movement direction
       const forwardX = -Math.sin(cameraYaw);
       const forwardZ = -Math.cos(cameraYaw);
       const rightX = Math.cos(cameraYaw);
@@ -160,7 +169,6 @@ export class PlayerController {
       const nextX = THREE.MathUtils.clamp(this.x + nx * this.speed * dt, -148, 148);
       const nextZ = THREE.MathUtils.clamp(this.z + nz * this.speed * dt, -148, 148);
 
-      // Collision check against buildings & trees
       const canX = this.canStandAt(nextX, this.z, colliders, trees);
       const canZ = this.canStandAt(this.x, nextZ, colliders, trees);
       if (canX) this.x = nextX;
@@ -175,7 +183,7 @@ export class PlayerController {
       this.speed = THREE.MathUtils.damp(this.speed, 0, 14, dt);
     }
 
-    // Jump & Gravity
+    // Smooth ground height + jump physics
     const groundY = this.sampleSurfaceHeight(this.x, this.z);
     if (input.jump && this.isGrounded) {
       this.vy = 6.6;
@@ -190,7 +198,6 @@ export class PlayerController {
       this.isGrounded = true;
     }
 
-    // Footstep sound
     if (this.isGrounded && this.speed > 0.8) {
       this.stepTimer -= dt * (this.speed / 4.5);
       if (this.stepTimer <= 0) {
@@ -210,8 +217,11 @@ export class PlayerController {
       this.posture,
       this.combat.action,
       this.combat.timer,
-      false
+      false,
+      this.combat.weaponMode === 'gun'
     );
+
+    return { meleeHit, gunFired };
   }
 
   private canStandAt(
@@ -220,12 +230,12 @@ export class PlayerController {
     colliders: BoxCollider[],
     trees: Array<{ x: number; z: number; r: number }>
   ): boolean {
-    // Prevent walking into deep Padma river water
     if (groundHeightAt(x, z) < -1.15 && !(x >= 10.2 && x <= 13.8 && z >= -45 && z <= -31)) {
       return false;
     }
-    const r = 0.45;
+    const r = 0.36;
     for (const c of colliders) {
+      if (c.disabled) continue;
       if (x + r > c.minX && x - r < c.maxX && z + r > c.minZ && z - r < c.maxZ) {
         return false;
       }

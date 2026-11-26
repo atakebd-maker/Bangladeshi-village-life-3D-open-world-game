@@ -25,10 +25,16 @@ export const MiniMap: React.FC<MiniMapProps> = ({
     const w = c.width;
     const h = c.height;
     const half = w / 2;
-    const scale = 0.62; // 1 meter -> 0.62 px
+    const scale = 0.62;
 
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = '#182818';
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(half, half, half - 1, 0, Math.PI * 2);
+    ctx.clip();
+
+    ctx.fillStyle = 'rgba(20, 34, 20, 0.92)';
     ctx.fillRect(0, 0, w, h);
 
     const toMap = (wx: number, wz: number): [number, number] => [
@@ -63,41 +69,63 @@ export const MiniMap: React.FC<MiniMapProps> = ({
     // Village Dirt Roads
     const [, ewY] = toMap(0, 6);
     const [nsX] = toMap(12, 0);
-    ctx.fillStyle = '#a18058';
+    ctx.fillStyle = '#b48f60';
     ctx.fillRect(Math.max(0, rx), ewY - 2, hx - Math.max(0, rx), 4);
     ctx.fillRect(nsX - 2, 0, 4, h);
+
+    // Subtle radar ring
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(half, half, half * 0.55, 0, Math.PI * 2);
+    ctx.stroke();
 
     // Markers
     for (const m of markers) {
       const [mx, my] = toMap(m.x, m.z);
-      if (mx < 2 || mx > w - 2 || my < 2 || my > h - 2) continue;
+      if (Math.hypot(mx - half, my - half) > half - 5) continue;
       ctx.fillStyle = m.color;
       ctx.beginPath();
-      ctx.arc(mx, my, m.kind === 'mission' ? 4 : 2.6, 0, Math.PI * 2);
+      ctx.arc(mx, my, m.kind === 'mission' ? 4 : 2.5, 0, Math.PI * 2);
       ctx.fill();
+      if (m.kind === 'mission') {
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     }
 
     // Player Arrow at center
     ctx.save();
     ctx.translate(half, half);
     ctx.rotate(-playerHeading + Math.PI);
-    ctx.fillStyle = '#fef08a';
+    ctx.fillStyle = '#fde047';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(0, -6);
-    ctx.lineTo(4.5, 5);
+    ctx.moveTo(0, -6.5);
+    ctx.lineTo(4.8, 5);
     ctx.lineTo(0, 2.5);
-    ctx.lineTo(-4.5, 5);
+    ctx.lineTo(-4.8, 5);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
     ctx.restore();
   }, [playerX, playerZ, playerHeading, markers]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={112}
-      height={112}
-      className="h-[96px] w-[96px] sm:h-[112px] sm:w-[112px] rounded-xl border-2 border-slate-700 bg-slate-900 shadow-lg"
-    />
+    <div className="relative h-[86px] w-[86px] sm:h-[104px] sm:w-[104px] select-none">
+      <div className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-black/80 px-1.5 py-[1px] text-[9px] font-black leading-none text-white border border-white/50">
+        N
+      </div>
+      <canvas
+        ref={canvasRef}
+        width={104}
+        height={104}
+        className="h-full w-full rounded-full border-2 border-white/80 bg-black/40 shadow-[0_2px_12px_rgba(0,0,0,0.65)]"
+      />
+    </div>
   );
 };
