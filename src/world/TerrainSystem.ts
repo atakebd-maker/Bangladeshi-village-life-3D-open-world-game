@@ -49,22 +49,22 @@ export function groundHeightAt(x: number, z: number): number {
 }
 
 export function getLocationName(x: number, z: number): string {
-  if (x < riverBankX(z) + 12) return 'Padma River Bank';
-  if (Math.hypot(x - -26, z - 22) < 20) return 'Village Pond (Pukur)';
-  if (Math.hypot(x - 18, z - 66) < 32) return 'Village Cricket Field';
-  if (Math.abs(x + 34) < 24 && Math.abs(z - 88) < 16) return 'Village Football Ground';
-  if (x > 24 && x < 62 && z > -14 && z < 38) return 'Village Bazaar';
-  if (Math.hypot(x - 24, z + 18) < 18) return 'Shanti Jame Mosque';
-  if (Math.hypot(x + 14, z + 84) < 20) return 'Shonargaon Village School';
-  if (Math.hypot(x - 30, z + 86) < 18) return 'Darul Ulum Madrasa';
-  if (Math.hypot(x - 58, z - 48) < 18) return 'Highway Bus Stand';
-  if (Math.hypot(x - 80, z - 32) < 16) return 'Village Police Outpost';
-  if (Math.hypot(x - 80, z + 12) < 16) return 'Rahman Motor Repair Garage';
-  if (Math.hypot(x - 56, z + 66) < 16) return 'Community Health Clinic';
-  if (Math.abs(z + 38) < 10 && Math.abs(x - 12) < 12) return 'Bamboo Bridge (Shako)';
-  if (x > 86) return z > 0 ? 'Mustard Fields' : 'Eastern Paddy Fields';
-  if (x < -10 && z < -48) return 'Northern Paddy Fields';
-  return 'Shonargaon Homesteads';
+  if (x < riverBankX(z) + 12) return 'পদ্মা নদীর পাড়';
+  if (Math.hypot(x - -26, z - 22) < 20) return 'গ্রামের পুকুর পাড়';
+  if (Math.hypot(x - 18, z - 66) < 32) return 'গ্রামের ক্রিকেট মাঠ';
+  if (Math.abs(x + 34) < 24 && Math.abs(z - 88) < 16) return 'গ্রামের ফুটবল মাঠ';
+  if (x > 24 && x < 62 && z > -14 && z < 38) return 'সোনারগাঁও বাজার';
+  if (Math.hypot(x - 24, z + 18) < 18) return 'শান্তি জামে মসজিদ';
+  if (Math.hypot(x + 14, z + 84) < 20) return 'সোনারগাঁও উচ্চ বিদ্যালয়';
+  if (Math.hypot(x - 30, z + 86) < 18) return 'দারুল উলুম মাদ্রাসা';
+  if (Math.hypot(x - 58, z - 48) < 18) return 'হাইওয়ে বাস স্ট্যান্ড';
+  if (Math.hypot(x - 80, z - 32) < 16) return 'গ্রাম পুলিশ ফাঁড়ি';
+  if (Math.hypot(x - 80, z + 12) < 16) return 'রহমান মোটর গ্যারেজ';
+  if (Math.hypot(x - 56, z + 66) < 16) return 'গ্রাম স্বাস্থ্য কেন্দ্র';
+  if (Math.abs(z + 38) < 10 && Math.abs(x - 12) < 12) return 'বাঁশের সাঁকো';
+  if (x > 86) return z > 0 ? 'সরিষা ক্ষেত' : 'পূর্ব দিকের ধান ক্ষেত';
+  if (x < -10 && z < -48) return 'উত্তর দিকের ধান ক্ষেত';
+  return 'সোনারগাঁও বসতবাড়ি';
 }
 
 export class TerrainSystem {

@@ -11,14 +11,14 @@
     overflow: hidden;
     touch-action: none;
     background-color: #070b12;
-    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    font-family: "Noto Sans Bengali", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
 }
 
 .font-display {
-  font-family: "Chakra Petch", "Plus Jakarta Sans", sans-serif;
+  font-family: "Chakra Petch", "Noto Sans Bengali", "Plus Jakarta Sans", sans-serif;
 }
 
 .font-mono-num {

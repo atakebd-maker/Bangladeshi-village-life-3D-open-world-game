@@ -8,189 +8,189 @@ export interface DialogueEntry {
 
 export const VILLAGE_DIALOGUES: Record<string, DialogueEntry> = {
   karim_farmer: {
-    speaker: 'Karim Chacha (Farmer)',
-    greeting: 'Assalamu Alaikum, baba! Working the Aman paddy fields since sunrise.',
+    speaker: 'করিম চাচা (কৃষক)',
+    greeting: 'আসসালামু আলাইকুম, বাবা! ভোর থেকেই আমন ধানের ক্ষেতে কাজ করছি।',
     choices: [
       {
-        label: 'How is the rice harvest?',
-        reply: 'Alhamdulillah, this season’s rain made the stalks tall and golden. We harvest next week!',
+        label: 'এবার ধানের ফলন কেমন হয়েছে?',
+        reply: 'আলহামদুলিল্লাহ, ভালো বৃষ্টি হওয়ায় এবার সোনালি ধানের বাম্পার ফলন হয়েছে। পরের সপ্তাহেই ধান কাটা শুরু!',
       },
       {
-        label: 'Here is hot Dudh Cha for you!',
-        reply: 'Ah, Rahim’s ginger tea! Nothing tastes better on the paddy bund. Bless you, my boy!',
+        label: 'আপনার জন্য গরম দুধ চা এনেছি!',
+        reply: 'আহা, রহিমের দোকানের আদা দেওয়া দুধ চা! ক্ষেতের আইলে বসে চা খাওয়ার মজাই আলাদা। দোয়া করি বাবা!',
         completeMissionId: 'mission-tea',
       },
       {
-        label: 'Any danger in the village?',
-        reply: 'Careful crossing the paved highway — buses and cargo trucks speed down from Dhaka!',
+        label: 'গ্রামের রাস্তায় কোনো বিপদ আছে কি?',
+        reply: 'হাইওয়ে রাস্তা পার হওয়ার সময় সাবধান থেকো বাবা — ঢাকা থেকে বড় বাস আর ট্রাক খুব জোরে আসে!',
       },
     ],
   },
   rahim_tea: {
-    speaker: 'Rahim Mia (Cha Stall)',
-    greeting: 'Welcome to Rahim Cha Stall! Sit on the bench anytime for hot tea.',
+    speaker: 'রহিম মিয়া (চা স্টল)',
+    greeting: 'রহিমের চা স্টলে স্বাগতম! যেকোনো সময় বেঞ্চে বসে গরম চা খেতে পারো।',
     choices: [
       {
-        label: 'Give me a cup of Dudh Cha',
-        reply: 'Here is steaming hot Dudh Cha! Take an extra cup for Karim Chacha in the paddy field.',
-        giftItem: 'Hot Dudh Cha',
+        label: 'আমাকে এক কাপ দুধ চা দিন',
+        reply: 'এই নাও ধোঁয়া ওঠা গরম দুধ চা! ধান ক্ষেতের করিম চাচার জন্যও এক কাপ নিয়ে যেও।',
+        giftItem: 'গরম দুধ চা',
       },
       {
-        label: 'What is the bazaar news?',
-        reply: 'The cricket match is heating up on the southern field, and fresh Hilsa arrived from Padma!',
+        label: 'বাজারের নতুন খবর কী?',
+        reply: 'দক্ষিণের মাঠে দারুণ ক্রিকেট খেলা চলছে, আর পদ্মা থেকে টাটকা ইলিশ মাছ উঠেছে বাজারে!',
       },
       {
-        label: 'How is business today?',
-        reply: 'Alhamdulillah! Rickshaw pullers and travelers from the bus stand keep my kettle busy.',
+        label: 'আজ বেচাকেনা কেমন চলছে?',
+        reply: 'আলহামদুলিল্লাহ ভালো! রিকশাচালক আর বাস স্ট্যান্ডের যাত্রীদের কারণে কেতলি সারাক্ষণ গরম থাকে।',
       },
     ],
   },
   salma_homemaker: {
-    speaker: 'Salma Begum',
-    greeting: 'Good morning! Have you seen the water lilies blooming in our village pond?',
+    speaker: 'সালমা বেগম',
+    greeting: 'শুভ সকাল! আমাদের গ্রামের পুকুরে শাপলা ফুল ফুটেছে, দেখেছ?',
     choices: [
       {
-        label: 'Can I go inside the house?',
-        reply: 'Of course! Walk up to our tin-roof house door and tap Open Door to rest inside.',
+        label: 'আমি কি ঘরের ভিতরে যেতে পারি?',
+        reply: 'অবশ্যই! টিনের ঘরের দরজার কাছে গিয়ে "দরজা খুলুন" বাটনে চাপ দিলেই ভিতরে ঢুকতে পারবে।',
       },
       {
-        label: 'Any ripe mangoes today?',
-        reply: 'Take these sweet Himsagar mangoes from our courtyard tree!',
-        giftItem: 'Ripe Himsagar Mango',
+        label: 'গাছে কোনো পাকা আম আছে কি?',
+        reply: 'এই নাও আমাদের উঠোনের গাছের মিষ্টি হিমসাগর আম!',
+        giftItem: 'পাকা হিমসাগর আম',
       },
       {
-        label: 'Where are the ducks?',
-        reply: 'They are swimming around the pond ghat right beside the water lilies.',
+        label: 'হাঁসগুলো কোথায় গেল?',
+        reply: 'শাপলা ফুলের পাশ দিয়ে পুকুরের ঘাটে সাঁতার কাটছে।',
       },
     ],
   },
   tariq_cricket: {
-    speaker: 'Tariq (Cricket Captain)',
-    greeting: 'Hey champ! Shonargaon Tigers need a hard-hitting batsman right now!',
+    speaker: 'তারিক (ক্রিকেট অধিনায়ক)',
+    greeting: 'চলে এসো ভাই! সোনারগাঁও টাইগার্সের এখন একজন ভালো ব্যাটসম্যান দরকার!',
     choices: [
       {
-        label: 'Hand me a cricket bat!',
-        reply: 'Here is our best Kashmir willow bat! Step onto the crease to face the first ball.',
-        giftItem: 'Willow Cricket Bat',
+        label: 'আমাকে একটি ক্রিকেট ব্যাট দিন!',
+        reply: 'এই নাও আমাদের সেরা উইলো কাঠের ব্যাট! ক্রিজে গিয়ে বল মোকাবিলা করো।',
+        giftItem: 'উইলো ক্রিকেট ব্যাট',
       },
       {
-        label: 'How do I hit a six?',
-        reply: 'Watch the bowler’s delivery and swing right when the timing bar hits the green zone!',
+        label: 'ছক্কা মারার কৌশল কী?',
+        reply: 'বোলারের বলের দিকে নজর রাখো এবং টাইমিং বার সবুজ ঘরে পৌঁছালেই ব্যাট চালাও!',
       },
       {
-        label: 'Who are we playing?',
-        reply: 'Padma Strikers from across the canal — let’s defend our village ground!',
+        label: 'কার বিপক্ষে খেলছি আমরা?',
+        reply: 'খালের ওপারের পদ্মা স্ট্রাইকার্সের সাথে — গ্রামের মাঠের সম্মান বাঁচাতে হবে!',
       },
     ],
   },
   rafiq_mechanic: {
-    speaker: 'Ustad Rafiq (Garage)',
-    greeting: 'Salam! Welcome to Rahman Motor Repair Garage.',
+    speaker: 'ওস্তাদ রফিক (গ্যারেজ)',
+    greeting: 'সালাম ভাই! রহমান মোটর মেরামত গ্যারেজে স্বাগতম।',
     choices: [
       {
-        label: 'Which bike is the fastest?',
-        reply: 'The blue 150cc Sports Bike out front flies on the paved highway. Try it out!',
+        label: 'কোন বাইকটি সবচেয়ে দ্রুত চলে?',
+        reply: 'সামনের নীল রঙের ১৫০ সিসি স্পোর্টস বাইকটি হাইওয়েতে ঝড়ের বেগে ছোটে। চালিয়ে দেখো!',
       },
       {
-        label: 'Are the highway vehicles safe?',
-        reply: 'Watch out when crossing the highway — moving buses and trucks won’t stop easily!',
+        label: 'হাইওয়ের গাড়িগুলো কি বিপজ্জনক?',
+        reply: 'সাবধানে রাস্তা পার হয়ো — চলন্ত বাস ও ট্রাক সহজে ব্রেক করে না, লাগলে জীবন সংকটে পড়বে!',
       },
       {
-        label: 'Can you repair a CNG?',
-        reply: 'CNG, easy bike, tractor, or bus — bring anything here and we fix it in minutes.',
+        label: 'আপনারা কি সিএনজি ঠিক করেন?',
+        reply: 'সিএনজি, ইজিবাইক, পিকআপ বা বাস — সব ধরনের গাড়ি এখানে মিনিটেই মেরামত করা হয়।',
       },
     ],
   },
   imam_mosque: {
-    speaker: 'Hafez Yunus (Mosque)',
-    greeting: 'Assalamu Alaikum wa Rahmatullah. Peace be upon you, young traveler.',
+    speaker: 'হাফেজ ইউনুস (মসজিদ)',
+    greeting: 'আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ। শান্তি জামে মসজিদে স্বাগতম, বাবা।',
     choices: [
       {
-        label: 'May I pray inside the Mosque?',
-        reply: 'Yes, the mosque doors are open to everyone. Peace and kindness build our village.',
+        label: 'মসজিদে কি নামাজ পড়া যাবে?',
+        reply: 'হ্যাঁ বাবা, আল্লাহর ঘর সবার জন্য খোলা। শান্তি ও সততা দিয়েই আমাদের গ্রাম গড়ে উঠেছে।',
       },
       {
-        label: 'Tell me about Shonargaon',
-        reply: 'Our village sits beside the great river, surrounded by green paddy and honest folk.',
+        label: 'সোনারগাঁও গ্রাম সম্পর্কে বলুন',
+        reply: 'পদ্মা নদীর পাড়ে আমাদের এই সবুজ গ্রাম — চারদিকে ধানক্ষেত, পুকুর আর সহজ-সরল মানুষ।',
       },
       {
-        label: 'Pray for our village',
-        reply: 'May Allah keep every farmer, student, and traveler safe from harm.',
+        label: 'গ্রামের সবার জন্য দোয়া করুন',
+        reply: 'আল্লাহ আমাদের গ্রামের প্রতিটি কৃষক, ছাত্র ও পথচারীকে নিরাপদ ও সুস্থ রাখুন।',
       },
     ],
   },
   teacher_school: {
-    speaker: 'Master Anisur (School)',
-    greeting: 'Good morning! Welcome to Shonargaon High School.',
+    speaker: 'মাস্টার আনিসুর (স্কুল)',
+    greeting: 'সুপ্রভাত! সোনারগাঁও উচ্চ বিদ্যালয়ে তোমাকে স্বাগতম।',
     choices: [
       {
-        label: 'Did you see the Bamboo Bridge?',
-        reply: 'Crossing the shako bridge safely takes balance! Our students cross it every day.',
+        label: 'বাঁশের সাঁকো দিয়েই এলাম!',
+        reply: 'সাবধান! খালের ওপরের বাঁশের সাঁকো পার হতে বেশ ভারসাম্য লাগে। আমাদের ছাত্ররা প্রতিদিন এ পথেই আসে।',
         completeMissionId: 'mission-bridge',
       },
       {
-        label: 'What are students studying?',
-        reply: 'Today’s lesson is about the rivers, agriculture, and heritage of rural Bangladesh.',
+        label: 'ছাত্রছাত্রীরা কী পড়াশোনা করছে?',
+        reply: 'আজকের ক্লাসে বাংলাদেশের নদী, কৃষি আর গ্রামীণ ঐতিহ্য নিয়ে পাঠদান হচ্ছে।',
       },
       {
-        label: 'Is sports allowed after class?',
-        reply: 'Yes! Both the cricket pitch and football ground are open every afternoon.',
+        label: 'ক্লাস শেষে কি খেলাধুলা হয়?',
+        reply: 'হ্যাঁ! বিকাল হলেই ক্রিকেট ও ফুটবল মাঠে ছাত্রদের খেলা জমে ওঠে।',
       },
     ],
   },
   fisherman_river: {
-    speaker: 'Jele Monir (Fisherman)',
-    greeting: 'Fresh catch from the Padma River! Look at the wooden boats bobbing on the shore.',
+    speaker: 'জেলে মনির',
+    greeting: 'পদ্মা নদীর টাটকা মাছ! নদীর ঘাটে বাঁধা কাঠের নৌকাগুলো দেখো।',
     choices: [
       {
-        label: 'What did you catch today?',
-        reply: 'Silver Hilsa and big river Rui! Take a fresh Rui fish to the bazaar.',
-        giftItem: 'Fresh River Rui Fish',
+        label: 'আজ কী কী মাছ ধরেছেন?',
+        reply: 'রুপালি ইলিশ আর বড় রুই মাছ উঠেছে! এই তাজা রুই মাছটি বাজারে নিয়ে যাও।',
+        giftItem: 'তাজা পদ্মার রুই মাছ',
         completeMissionId: 'mission-river',
       },
       {
-        label: 'How are the river tides?',
-        reply: 'Calm this morning, though monsoon thunderstorms make the waves rise fast.',
+        label: 'নদীর ঢেউ কেমন আজ?',
+        reply: 'সকালের দিকে শান্তই আছে, তবে বর্ষার ঝড়-বৃষ্টিতে পদ্মায় বড় ঢেউ ওঠে।',
       },
       {
-        label: 'Can I ride in a Nouka boat?',
-        reply: 'Walk along the wooden ghat to enjoy the river breeze anytime!',
+        label: 'নৌকায় ঘুরতে পারি কি?',
+        reply: 'কাঠের ঘাট দিয়ে নেমে নদীর শীতল বাতাস উপভোগ করতে পারো যেকোনো সময়!',
       },
     ],
   },
   shopper_general: {
-    speaker: 'Village Neighbor',
-    greeting: 'Assalamu Alaikum! Beautiful day in Shonargaon Bazaar.',
+    speaker: 'গ্রামের প্রতিবেশী',
+    greeting: 'আসসালামু আলাইকুম! আজ সোনারগাঁও বাজারের আবহাওয়া খুব চমৎকার।',
     choices: [
       {
-        label: 'Where can I find a rickshaw?',
-        reply: 'Head east toward the Rickshaw Stand — there are cycle rickshaws and green CNGs waiting!',
+        label: 'রিকশা বা সিএনজি কোথায় পাবো?',
+        reply: 'পূর্ব দিকে রিকশা স্ট্যান্ডে যান — সেখানে সাইকেল রিকশা আর সবুজ সিএনজি দাঁড়িয়ে আছে!',
       },
       {
-        label: 'What is good to eat here?',
-        reply: 'Bangla Hotel serves hot rice and curry, and Rahim’s stall has the best tea.',
+        label: 'এখানে ভালো খাবার কী পাওয়া যায়?',
+        reply: 'বাংলা হোটেলে গরম ভাত-তরকারি আর রহিম ভাইয়ের দোকানে সেরা দুধ চা পাওয়া যায়।',
       },
       {
-        label: 'See you around!',
-        reply: 'Allah Hafez! Stay safe on the busy highway!',
+        label: 'ভালো থাকবেন, দেখা হবে!',
+        reply: 'আল্লাহ হাফেজ! বড় রাস্তায় গাড়ি-ঘোড়া দেখে সাবধানে চলবেন!',
       },
     ],
   },
   police_officer: {
-    speaker: 'SI Faruk (Police)',
-    greeting: 'Keep the peace in Shonargaon! We patrol the highway and bazaar.',
+    speaker: 'এসআই ফারুক (পুলিশ)',
+    greeting: 'সোনারগাঁওয়ের শান্তি বজায় রাখুন! আমরা হাইওয়ে ও বাজারে টহল দিচ্ছি।',
     choices: [
       {
-        label: 'Is the highway busy today?',
-        reply: 'Heavy buses and trucks pass through — look both ways before crossing the asphalt road!',
+        label: 'আজ হাইওয়েতে গাড়ি কেমন চলছে?',
+        reply: 'বাস, ট্রাক আর সিএনজি প্রচুর চলছে — পাকা রাস্তা পার হওয়ার সময় দু’পাশ দেখে নেবেন!',
       },
       {
-        label: 'Can I drive the Patrol Jeep?',
-        reply: 'Only in emergencies, citizen — though there are plenty of motorcycles and CNGs around.',
+        label: 'পুলিশের জিপ গাড়িটি কি চালানো যাবে?',
+        reply: 'জরুরি প্রয়োজন ছাড়া নয় নাগরিক — তবে গ্রামে প্রচুর মোটরসাইকেল আর সিএনজি রয়েছে।',
       },
       {
-        label: 'Just checking in!',
-        reply: 'Stay respectful with villagers and enjoy exploring our rural heritage.',
+        label: 'খোঁজখবর নিতে এলাম!',
+        reply: 'গ্রামবাসীর সাথে ভালো ব্যবহার করুন এবং আমাদের সুন্দর গ্রাম ঘুরে দেখুন।',
       },
     ],
   },
@@ -202,19 +202,19 @@ export function getDialogueForNpc(key: string | undefined, fallbackName: string)
   }
   return {
     speaker: fallbackName,
-    greeting: `Assalamu Alaikum! I am ${fallbackName} from Shonargaon.`,
+    greeting: `আসসালামু আলাইকুম! আমি ${fallbackName}, সোনারগাঁও গ্রামের বাসিন্দা।`,
     choices: [
       {
-        label: 'How is life in the village?',
-        reply: 'Peaceful and lively! Morning birds, fresh air, and friendly neighbors everywhere.',
+        label: 'গ্রামের জীবনযাত্রা কেমন লাগছে?',
+        reply: 'খুবই শান্তিময় ও প্রাণবন্ত! সকালের পাখির ডাক, নির্মল বাতাস আর মিলেমিশে থাকা মানুষ।',
       },
       {
-        label: 'Where should I explore next?',
-        reply: 'Try visiting the Padma River bank, the Mosque, or play cricket on the south field!',
+        label: 'এখন কোথায় ঘুরতে যাওয়া উচিত?',
+        reply: 'পদ্মা নদীর পাড়, শান্তি জামে মসজিদ দেখতে পারেন অথবা দক্ষিণের মাঠে ক্রিকেট খেলতে পারেন!',
       },
       {
-        label: 'Take care!',
-        reply: 'Khoda Hafez! Have a wonderful time in Bangladesh Village Life 3D.',
+        label: 'ভালো থাকুন!',
+        reply: 'খোদা হাফেজ! বাংলাদেশ ভিলেজ লাইফ থ্রিডি গেমে আপনার ভ্রমণ শুভ হোক।',
       },
     ],
   };

@@ -387,11 +387,15 @@ export class GameManager {
     this.audio.playUiClick();
   }
 
+  public getMissions() {
+    return this.missions.missions;
+  }
+
   private handlePlayerDamaged(dmg: number): void {
     if (this.isDead) return;
     this.player.takeDamage(dmg, this.audio);
     if (this.player.health <= 0) {
-      this.handlePlayerKilled('Knocked out in village brawl');
+      this.handlePlayerKilled('গ্রামবাসীর সাথে মারামারিতে অজ্ঞান হয়ে গেছেন');
     }
   }
 
@@ -710,7 +714,7 @@ export class GameManager {
       this.player.z,
       Boolean(activeVeh),
       this.dayNight.isNight(),
-      (vehLabel) => this.handlePlayerKilled(`Hit by ${vehLabel}`)
+      (vehLabel) => this.handlePlayerKilled(`${vehLabel}-এর সাথে ধাক্কা লেগেছে`)
     );
 
     // Update NPCs, Animals, Sports, World Atmosphere

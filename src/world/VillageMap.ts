@@ -44,7 +44,7 @@ export class VillageMap {
     this.group.add(HouseModels.createHaystack(-30, -4));
     this.group.add(HouseModels.createFenceRun(-32, -21, -8, -21, 'bamboo', textures));
     this.group.add(InteriorSystem.createCharpoi('charpoi-home', -12, -5, 0.2, textures, this.sitSpots));
-    this.addMarker('home', 'Homestead', -16, -10, '#22c55e', 'building');
+    this.addMarker('home', 'বসতবাড়ি', -16, -10, '#22c55e', 'building');
 
     // 2. South-West Mud & Tin Homestead
     this.group.add(HouseModels.createVillageHouse('door-sw-mud', 'mud', -26, 48, 0, textures, this.colliders, this.doors, 'red'));
@@ -68,8 +68,8 @@ export class VillageMap {
     this.group.add(
       MarketModels.createShopStall('চা স্টল', 'Rahim Tea Stall', 30, 15, Math.PI, 0x15803d, '#064e3b', textures, this.colliders, 'tea')
     );
-    this.group.add(InteriorSystem.createBench('bench-tea-1', 'Sit at Tea Stall', 29, 11.5, 0, textures, this.sitSpots));
-    this.group.add(InteriorSystem.createBench('bench-tea-2', 'Sit at Tea Stall', 32, 11.5, 0, textures, this.sitSpots));
+    this.group.add(InteriorSystem.createBench('bench-tea-1', 'চা স্টলের বেঞ্চে বসুন', 29, 11.5, 0, textures, this.sitSpots));
+    this.group.add(InteriorSystem.createBench('bench-tea-2', 'চা স্টলের বেঞ্চে বসুন', 32, 11.5, 0, textures, this.sitSpots));
 
     // Grocery Shop
     this.group.add(
@@ -101,13 +101,13 @@ export class VillageMap {
 
     // Rickshaw Stand
     this.group.add(MarketModels.createRickshawStand(58, 12, textures));
-    this.addMarker('bazaar', 'Bazaar', 44, 14, '#f59e0b', 'building');
+    this.addMarker('bazaar', 'সোনারগাঁও বাজার', 44, 14, '#f59e0b', 'building');
   }
 
   private buildCivicBuildings(textures: TextureLibrary): void {
     // Mosque
     this.group.add(SchoolModels.createMosque(24, -18, textures, this.colliders));
-    this.addMarker('mosque', 'Mosque', 24, -18, '#10b981', 'building');
+    this.addMarker('mosque', 'জামে মসজিদ', 24, -18, '#10b981', 'building');
 
     // School
     this.group.add(
@@ -124,7 +124,7 @@ export class VillageMap {
         this.colliders
       )
     );
-    this.addMarker('school', 'School', -14, -84, '#38bdf8', 'building');
+    this.addMarker('school', 'উচ্চ বিদ্যালয়', -14, -84, '#38bdf8', 'building');
 
     // Madrasa
     this.group.add(
@@ -162,8 +162,8 @@ export class VillageMap {
     this.group.add(
       SchoolModels.createBusStandOrPoliceOrGarage('bus_stand', 59, 48, Math.PI / 2, textures, this.colliders)
     );
-    this.group.add(InteriorSystem.createBench('bench-bus', 'Sit at Bus Stand', 59.5, 48, Math.PI / 2, textures, this.sitSpots));
-    this.addMarker('bus', 'Bus Stand', 59, 48, '#60a5fa', 'building');
+    this.group.add(InteriorSystem.createBench('bench-bus', 'বাস স্ট্যান্ডের বেঞ্চে বসুন', 59.5, 48, Math.PI / 2, textures, this.sitSpots));
+    this.addMarker('bus', 'বাস স্ট্যান্ড', 59, 48, '#60a5fa', 'building');
 
     this.group.add(
       SchoolModels.createBusStandOrPoliceOrGarage('police', 80, 32, -Math.PI / 2, textures, this.colliders)
@@ -171,7 +171,7 @@ export class VillageMap {
     this.group.add(
       SchoolModels.createBusStandOrPoliceOrGarage('garage', 80, -12, -Math.PI / 2, textures, this.colliders)
     );
-    this.addMarker('garage', 'Garage', 80, -12, '#fb923c', 'building');
+    this.addMarker('garage', 'মোটর গ্যারেজ', 80, -12, '#fb923c', 'building');
   }
 
   private buildSportsGrounds(): void {
@@ -226,7 +226,7 @@ export class VillageMap {
         this.group.add(s);
       }
     }
-    this.addMarker('cricket', 'Cricket Field', 18, 66, '#facc15', 'sport');
+    this.addMarker('cricket', 'ক্রিকেট মাঠ', 18, 66, '#facc15', 'sport');
 
     // 2. Football Field at (-34, 88)
     const fbPitch = new THREE.Mesh(
@@ -257,7 +257,7 @@ export class VillageMap {
       bar.position.set(gx, 2.3, 88);
       this.group.add(bar);
     }
-    this.addMarker('football', 'Football Ground', -34, 88, '#a3e635', 'sport');
+    this.addMarker('football', 'ফুটবল মাঠ', -34, 88, '#a3e635', 'sport');
   }
 
   private buildAgriculture(textures: TextureLibrary): void {

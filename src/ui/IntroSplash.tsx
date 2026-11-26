@@ -11,9 +11,9 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({
   onStartAudio,
   onComplete,
 }) => {
-  // Phase 1: Black screen with "TAHSIN STUDIO" in English
-  // Phase 2: Cover artwork with the two characters and "BANGLADESH VILLAGE LIFE 3D" title
-  // Phase 3: Smooth fade out into Main Menu
+  // ধাপ ১: কালো স্ক্রিনে ইংরেজিতে "TAHSIN STUDIO"
+  // ধাপ ২: দুইজন মানুষসহ গেমের কভার ছবি
+  // ধাপ ৩: মূল মেনুতে প্রবেশ
   const [phase, setPhase] = useState<'studio' | 'cover' | 'fadeout'>('studio');
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({
       {phase === 'studio' ? (
         <div className="relative flex flex-col items-center justify-center px-6 text-center">
           <p className="mb-2 text-[11px] font-semibold tracking-[0.45em] text-amber-400/90 uppercase">
-            Presents
+            পরিবেশনায়
           </p>
           <div className="relative overflow-hidden px-6 py-2">
             <h1 className="font-display text-4xl font-bold tracking-[0.22em] text-white sm:text-6xl drop-shadow-[0_6px_28px_rgba(245,158,11,0.3)]">
@@ -58,7 +58,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
           <div className="pointer-events-none absolute bottom-4 left-6 right-6 flex items-center justify-between text-xs text-slate-200">
             <span className="font-semibold tracking-wider text-amber-300">TAHSIN STUDIO</span>
-            <span className="text-slate-300">Starting Village World...</span>
+            <span className="text-slate-200">গ্রামের জগৎ শুরু হচ্ছে...</span>
           </div>
         </div>
       )}
@@ -72,7 +72,7 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({
           }}
           className="absolute top-4 right-5 z-10 rounded-lg border border-white/25 bg-black/75 px-3.5 py-1.5 text-xs font-semibold tracking-wider text-white transition hover:border-amber-400 whitespace-nowrap"
         >
-          Skip Intro
+          স্কিপ করুন
         </button>
       )}
     </div>

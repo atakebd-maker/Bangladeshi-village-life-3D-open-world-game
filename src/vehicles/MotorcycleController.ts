@@ -14,10 +14,10 @@ export class MotorcycleController {
   ): VehicleEntity {
     const label =
       kind === 'sports_bike'
-        ? 'Sports Bike 150cc'
+        ? 'স্পোর্টস বাইক ১৫০সিসি'
         : kind === 'bicycle'
-          ? 'Village Bicycle'
-          : 'Bangla Motorcycle 125cc';
+          ? 'গ্রামের বাইসাইকেল'
+          : 'মোটরসাইকেল ১২৫সিসি';
     const veh = new VehicleEntity(
       {
         id,

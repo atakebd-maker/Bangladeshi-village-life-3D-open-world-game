@@ -90,7 +90,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     Object.assign(gm.input, patch);
   };
 
-  // Virtual Joystick Handlers
+  // ভার্চুয়াল জয়স্টিক কন্ট্রোল
   const handleJoyDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -126,8 +126,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     setInput({ moveX: dx / maxR, moveY: -dy / maxR });
   };
 
-  // Open-Area Touch/Mouse Camera Look
+  // ফাঁকা জায়গায় টাচ/ড্র্যাগ করলে ক্যামেরা ঘুরবে (বাটনে চাপ পড়বে না)
   const handleLookDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('button')) return;
     lookPointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
   };
 
@@ -146,7 +147,6 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
     }
   };
 
-  // Screenshot-matched translucent dark circular button with white outline & crisp white icon
   const actionCircle =
     'flex flex-col items-center justify-center rounded-full border-2 border-white/80 bg-black/40 text-white active:scale-90 transition-transform select-none touch-none shadow-[0_3px_12px_rgba(0,0,0,0.45)]';
 
@@ -156,15 +156,15 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
       onPointerMove={handleLookMove}
       onPointerUp={handleLookUp}
       onPointerCancel={handleLookUp}
-      className="fixed inset-0 z-10 pointer-events-auto"
+      className="fixed inset-0 z-0 pointer-events-auto"
     >
-      {/* Left Thumb Zone: Screenshot-Matched Translucent White-Ringed Virtual Joystick */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-7">
+      {/* বাম থাম্ব: ভার্চুয়াল জয়স্টিক অথবা গাড়ির স্টিয়ারিং */}
+      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-7 z-10">
         {isDriving ? (
           <div className="flex items-center gap-3">
             <button
               type="button"
-              aria-label="Steer Left"
+              aria-label="বামে ঘোরান"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ steer: -1 });
@@ -180,7 +180,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             </button>
             <button
               type="button"
-              aria-label="Steer Right"
+              aria-label="ডানে ঘোরান"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ steer: 1 });
@@ -203,7 +203,6 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             onPointerCancel={handleJoyUp}
             className="relative flex h-[112px] w-[112px] sm:h-[124px] sm:w-[124px] items-center justify-center rounded-full border-2 border-white/75 bg-black/25 touch-none shadow-[0_2px_14px_rgba(0,0,0,0.45)]"
           >
-            {/* 4 Directional White Triangles matching reference screenshot */}
             <span className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 text-[10px] leading-none text-white/95">
               ▲
             </span>
@@ -217,7 +216,6 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               ▶
             </span>
 
-            {/* Center 3D Shaded White/Silver Joystick Knob */}
             <div
               className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white bg-gradient-to-b from-white via-slate-200 to-slate-400 shadow-[0_3px_10px_rgba(0,0,0,0.5)]"
               style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
@@ -226,14 +224,14 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
         )}
       </div>
 
-      {/* Right Thumb Zone: Screenshot-Matched Circular Action Cluster */}
-      <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
+      {/* ডান থাম্ব: গোল অ্যাকশন বাটনসমূহ */}
+      <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10">
         {isDriving ? (
           <div className="flex items-end gap-2.5">
             <button
               type="button"
-              aria-label="Horn"
-              title="Horn"
+              aria-label="হর্ন"
+              title="হর্ন"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ horn: true });
@@ -249,8 +247,8 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
 
             <button
               type="button"
-              aria-label="Brake or Reverse"
-              title="Brake / Reverse"
+              aria-label="ব্রেক বা পেছনে"
+              title="ব্রেক / পেছনে"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ brake: 1 });
@@ -263,13 +261,13 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               className={`${actionCircle} h-14 w-14 border-red-300/85 bg-black/50`}
             >
               <PedalIcon className="h-5 w-5" />
-              <span className="text-[8px] font-bold tracking-wider">BRAKE</span>
+              <span className="text-[8px] font-bold">ব্রেক</span>
             </button>
 
             <button
               type="button"
-              aria-label="Accelerate"
-              title="Gas"
+              aria-label="গ্যাস বা চালান"
+              title="সামনে চালান"
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ throttle: 1 });
@@ -282,13 +280,13 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               className={`${actionCircle} h-16 w-16 border-white bg-black/45`}
             >
               <PedalIcon className="h-6 w-6" />
-              <span className="text-[8px] font-bold tracking-wider">GAS</span>
+              <span className="text-[8px] font-bold">গ্যাস</span>
             </button>
 
             <button
               type="button"
-              aria-label="Exit Vehicle"
-              title="Exit Vehicle"
+              aria-label="গাড়ি থেকে নামুন"
+              title="গাড়ি থেকে নামুন"
               onClick={(e) => {
                 e.stopPropagation();
                 setInput({ vehicleToggle: true });
@@ -300,11 +298,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
           </div>
         ) : (
           <div className="relative h-[168px] w-[205px] sm:h-[180px] sm:w-[222px]">
-            {/* Top-left: Weapon Switch (Fist <-> Gun) */}
+            {/* অস্ত্র পরিবর্তন (ঘুষি / বন্দুক) */}
             <button
               type="button"
-              aria-label="Switch Weapon (Fist or Gun)"
-              title={weaponMode === 'gun' ? 'Switch to Fist' : 'Switch to Gun'}
+              aria-label="অস্ত্র বদল (ঘুষি বা বন্দুক)"
+              title={weaponMode === 'gun' ? 'খালি হাতে ফিরুন' : 'বন্দুক হাতে নিন'}
               onClick={(e) => {
                 e.stopPropagation();
                 gameRef.current?.toggleWeaponMode();
@@ -325,11 +323,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               )}
             </button>
 
-            {/* Top-middle: Sit */}
+            {/* বসা (Sit) */}
             <button
               type="button"
-              aria-label="Sit"
-              title="Sit"
+              aria-label="বসুন"
+              title="বসুন"
               onClick={(e) => {
                 e.stopPropagation();
                 setInput({ sitToggle: true });
@@ -339,11 +337,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               <Armchair className="h-5 w-5" />
             </button>
 
-            {/* Top-right: Jump (matches screenshot top-right jumping person circle) */}
+            {/* লাফ (Jump) */}
             <button
               type="button"
-              aria-label="Jump"
-              title="Jump"
+              aria-label="লাফ দিন"
+              title="লাফ দিন"
               onClick={(e) => {
                 e.stopPropagation();
                 setInput({ jump: true });
@@ -353,11 +351,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               <JumpPersonIcon className="h-7 w-7" />
             </button>
 
-            {/* Middle-left: Kick */}
+            {/* লাথি (Kick) */}
             <button
               type="button"
-              aria-label="Kick"
-              title="Kick"
+              aria-label="লাথি দিন"
+              title="লাথি দিন"
               onClick={(e) => {
                 e.stopPropagation();
                 setInput({ kick: true });
@@ -367,11 +365,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               <Footprints className="h-5 w-5" />
             </button>
 
-            {/* Bottom-left: Run / Sprint Toggle (matches screenshot running person circle) */}
+            {/* দৌড় (Sprint Toggle) */}
             <button
               type="button"
-              aria-label="Toggle Sprint"
-              title="Sprint"
+              aria-label="দৌড়ানো"
+              title="দৌড়ানো"
               onClick={(e) => {
                 e.stopPropagation();
                 const next = !sprintActive;
@@ -385,19 +383,15 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               <RunPersonIcon className="h-6 w-6" />
             </button>
 
-            {/* Middle-center: Contextual Door / Talk / Drive / Bat Interact */}
+            {/* দরজা / কথা বলা / গাড়ি / ব্যাট অ্যাকশন */}
             <button
               type="button"
               aria-label={
                 cricketActive
-                  ? 'Swing Bat'
-                  : activePrompt?.kind === 'vehicle'
-                    ? 'Drive Vehicle'
-                    : activePrompt?.kind === 'door'
-                      ? activePrompt.label
-                      : 'Interact'
+                  ? 'ব্যাট চালান'
+                  : activePrompt?.label ?? 'ইন্টারেক্ট'
               }
-              title={activePrompt?.label ?? 'Interact'}
+              title={activePrompt?.label ?? 'কাজ করুন'}
               onClick={(e) => {
                 e.stopPropagation();
                 if (activePrompt?.kind === 'vehicle') {
@@ -425,11 +419,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               )}
             </button>
 
-            {/* Primary Large Button: Punch (Fist) or Shoot (Gun) or Bat */}
+            {/* বড় প্রাইমারি বাটন: ঘুষি অথবা বন্দুক চালান */}
             <button
               type="button"
-              aria-label={weaponMode === 'gun' ? 'Shoot Gun' : 'Punch'}
-              title={weaponMode === 'gun' ? 'Shoot Gun (G)' : 'Punch (J)'}
+              aria-label={weaponMode === 'gun' ? 'গুলি করুন' : 'ঘুষি মারুন'}
+              title={weaponMode === 'gun' ? 'গুলি করুন (G)' : 'ঘুষি মারুন (J)'}
               onClick={(e) => {
                 e.stopPropagation();
                 if (cricketActive) {
@@ -453,11 +447,11 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
               )}
             </button>
 
-            {/* Bottom-right corner: Crouch (matches screenshot crouching person circle) */}
+            {/* নিচু হওয়া (Crouch) */}
             <button
               type="button"
-              aria-label="Crouch"
-              title="Crouch"
+              aria-label="নিচু হোন"
+              title="নিচু হোন"
               onClick={(e) => {
                 e.stopPropagation();
                 setInput({ crouch: true });

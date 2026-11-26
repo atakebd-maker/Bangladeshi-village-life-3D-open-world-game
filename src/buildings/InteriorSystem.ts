@@ -82,7 +82,7 @@ export class InteriorSystem {
       g.add(leg);
     }
 
-    sitSpots.push({ id, label: 'Sit on Bamboo Charpoi', x, y: gy + 0.52, z, rotY });
+    sitSpots.push({ id, label: 'বাঁশের মাচায় বসুন', x, y: gy + 0.52, z, rotY });
     return g;
   }
 }

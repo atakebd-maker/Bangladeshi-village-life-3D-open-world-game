@@ -31,7 +31,7 @@ export class PlayerInteraction {
   } {
     if (isDriving) {
       return {
-        prompt: { id: 'exit-veh', label: 'Exit Vehicle', kind: 'vehicle' },
+        prompt: { id: 'exit-veh', label: 'গাড়ি থেকে নামুন', kind: 'vehicle' },
         nearestVehicle: null,
         nearestNpc: null,
         nearestDoor: null,
@@ -55,7 +55,7 @@ export class PlayerInteraction {
       return {
         prompt: {
           id: nearestDoor.id,
-          label: nearestDoor.isOpen ? 'Close Door' : 'Open Door',
+          label: nearestDoor.isOpen ? 'দরজা বন্ধ করুন' : 'দরজা খুলুন',
           kind: 'door',
         },
         nearestVehicle: null,
@@ -78,7 +78,7 @@ export class PlayerInteraction {
     }
     if (nearestVehicle) {
       return {
-        prompt: { id: nearestVehicle.id, label: `Drive ${nearestVehicle.label}`, kind: 'vehicle' },
+        prompt: { id: nearestVehicle.id, label: `${nearestVehicle.label} চালান`, kind: 'vehicle' },
         nearestVehicle,
         nearestNpc: null,
         nearestDoor: null,
@@ -91,7 +91,7 @@ export class PlayerInteraction {
     const distCricket = Math.hypot(px - 18, pz - 74);
     if (distCricket < 7.5 && !cricketActive) {
       return {
-        prompt: { id: 'cricket-pitch', label: 'Play Village Cricket', kind: 'cricket' },
+        prompt: { id: 'cricket-pitch', label: 'ক্রিকেট খেলুন', kind: 'cricket' },
         nearestVehicle: null,
         nearestNpc: null,
         nearestDoor: null,
@@ -104,7 +104,7 @@ export class PlayerInteraction {
     const distFootball = Math.hypot(px - -34, pz - 88);
     if (distFootball < 18) {
       return {
-        prompt: { id: 'football-pitch', label: 'Kick Football', kind: 'football' },
+        prompt: { id: 'football-pitch', label: 'ফুটবল কিক দিন', kind: 'football' },
         nearestVehicle: null,
         nearestNpc: null,
         nearestDoor: null,
@@ -146,7 +146,7 @@ export class PlayerInteraction {
     }
     if (nearestNpc) {
       return {
-        prompt: { id: nearestNpc.id, label: `Talk to ${nearestNpc.name}`, kind: 'npc' },
+        prompt: { id: nearestNpc.id, label: `${nearestNpc.name}-এর সাথে কথা বলুন`, kind: 'npc' },
         nearestVehicle: null,
         nearestNpc,
         nearestDoor: null,

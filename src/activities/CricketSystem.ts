@@ -8,13 +8,13 @@ export class CricketSystem {
   public readonly group = new THREE.Group();
   public state: CricketHudState = {
     active: false,
-    teamName: 'Shonargaon Tigers',
-    opponentName: 'Padma Strikers',
+    teamName: 'সোনারগাঁও টাইগার্স',
+    opponentName: 'পদ্মা স্ট্রাইকার্স',
     runs: 0,
     wickets: 0,
     ballsBowled: 0,
     maxOvers: 2,
-    lastEvent: 'Step up to the crease to play',
+    lastEvent: 'খেলতে ক্রিজে দাঁড়ান',
     ballIncoming: false,
     timingProgress: 0,
     inningOver: false,
@@ -36,13 +36,12 @@ export class CricketSystem {
     this.ballMesh.castShadow = true;
     this.group.add(this.ballMesh);
 
-    // Bowler + 4 Fielders positioned around the cricket ground (center 18, 66)
     const positions: Array<[number, number, number]> = [
-      [18, 57, 0], // bowler
-      [7, 62, 0.9], // cover
-      [29, 64, -0.9], // mid-wicket
-      [11, 82, 2.5], // fine leg
-      [27, 81, -2.5], // third man
+      [18, 57, 0],
+      [7, 62, 0.9],
+      [29, 64, -0.9],
+      [11, 82, 2.5],
+      [27, 81, -2.5],
     ];
     positions.forEach(([fx, fz, rot], i) => {
       const rig = buildHumanRig(textures, {
@@ -57,16 +56,16 @@ export class CricketSystem {
     });
   }
 
-  public startMatch(teamName = 'Shonargaon Tigers', overs = 2): void {
+  public startMatch(teamName = 'সোনারগাঁও টাইগার্স', overs = 2): void {
     this.state = {
       active: true,
       teamName,
-      opponentName: 'Padma Strikers',
+      opponentName: 'পদ্মা স্ট্রাইকার্স',
       runs: 0,
       wickets: 0,
       ballsBowled: 0,
       maxOvers: overs,
-      lastEvent: 'Bowler running in — Get ready!',
+      lastEvent: 'বোলার দৌড়ে আসছে — প্রস্তুত হোন!',
       ballIncoming: false,
       timingProgress: 0,
       inningOver: false,
@@ -85,7 +84,7 @@ export class CricketSystem {
   public swingBat(audio: AudioManager): void {
     if (!this.state.active || this.state.inningOver || this.ballPhase !== 'bowling') return;
 
-    const timing = this.state.timingProgress; // sweet spot 0.72..0.92
+    const timing = this.state.timingProgress;
     const err = Math.abs(timing - 0.84);
     this.ballPhase = 'hit';
     this.state.ballIncoming = false;
@@ -93,23 +92,23 @@ export class CricketSystem {
 
     if (err < 0.08) {
       this.state.runs += 6;
-      this.state.lastEvent = 'SIX! Massive lofted shot over the trees!';
+      this.state.lastEvent = 'ছক্কা! গাছের ওপর দিয়ে বিশাল ছয়!';
       this.ballVel.set((Math.random() - 0.5) * 14, 13, -24);
       audio.playCricketHit('six');
     } else if (err < 0.17) {
       this.state.runs += 4;
-      this.state.lastEvent = 'FOUR! Cracking cover drive to the boundary!';
+      this.state.lastEvent = 'চার! দারুণ ড্রাইভে বাউন্ডারি!';
       this.ballVel.set((Math.random() > 0.5 ? 1 : -1) * 16, 4.5, -18);
       audio.playCricketHit('four');
     } else if (err < 0.28) {
       const r = Math.random() > 0.4 ? 2 : 1;
       this.state.runs += r;
-      this.state.lastEvent = `${r} Run${r > 1 ? 's' : ''} — Quick running between wickets!`;
+      this.state.lastEvent = `${r} রান — দ্রুত দৌড়ে রান সংগ্রহ!`;
       this.ballVel.set((Math.random() - 0.5) * 10, 3.5, -11);
       audio.playCricketHit('single');
     } else {
       this.state.wickets += 1;
-      this.state.lastEvent = 'CAUGHT OUT! Edged straight to the fielder!';
+      this.state.lastEvent = 'ক্যাচ আউট! ফিল্ডারের হাতে বল!';
       this.ballVel.set(6, 7, -6);
       audio.playCricketHit('miss');
     }
@@ -122,7 +121,7 @@ export class CricketSystem {
     const maxBalls = this.state.maxOvers * 6;
     if (this.state.wickets >= 5 || this.state.ballsBowled >= maxBalls) {
       this.state.inningOver = true;
-      this.state.lastEvent = `Innings Complete! Final Score: ${this.state.runs}/${this.state.wickets}`;
+      this.state.lastEvent = `ইনিংস শেষ! মোট স্কোর: ${this.state.runs}/${this.state.wickets}`;
     }
   }
 
@@ -137,25 +136,24 @@ export class CricketSystem {
         this.ballVel.set(0, -1.3, 12.2);
         this.state.ballIncoming = true;
         this.state.timingProgress = 0;
-        this.state.lastEvent = 'Ball incoming — Tap BAT now!';
+        this.state.lastEvent = 'বল আসছে — এখনই ব্যাট চালান!';
       }
     } else if (this.ballPhase === 'bowling') {
       this.ballPos.addScaledVector(this.ballVel, dt);
       if (this.ballPos.y < 0.12) {
         this.ballPos.y = 0.12;
-        this.ballVel.y = 3.2; // pitch bounce
+        this.ballVel.y = 3.2;
       } else {
         this.ballVel.y -= 9.5 * dt;
       }
       this.state.timingProgress = THREE.MathUtils.clamp((this.ballPos.z - 57.5) / 16.5, 0, 1);
 
       if (this.ballPos.z >= 75.0) {
-        // Missed ball -> bowled!
         this.ballPhase = 'idle';
         this.state.ballIncoming = false;
         this.state.ballsBowled++;
         this.state.wickets++;
-        this.state.lastEvent = 'BOWLED! Clean through the gate!';
+        this.state.lastEvent = 'বোল্ড আউট! স্টাম্প উড়ে গেছে!';
         audio.playCricketHit('miss');
         this.checkInningEnd();
         this.bowlTimer = 2.0;

@@ -12,10 +12,10 @@ export class RickshawController {
     textures: TextureLibrary
   ): VehicleEntity {
     const labelMap: Record<typeof kind, string> = {
-      cycle_rickshaw: 'Cycle Rickshaw',
-      cng: 'Green CNG Auto',
-      auto_rickshaw: 'Auto-Rickshaw',
-      easy_bike: 'Battery Easy Bike',
+      cycle_rickshaw: 'সাইকেল রিকশা',
+      cng: 'সবুজ সিএনজি অটো',
+      auto_rickshaw: 'অটোরিকশা',
+      easy_bike: 'ব্যাটারি ইজিবাইক',
     };
     const veh = new VehicleEntity(
       {

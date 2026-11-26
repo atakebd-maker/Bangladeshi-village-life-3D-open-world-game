@@ -45,17 +45,17 @@ export class WeatherSystem {
   public getWeatherLabel(): string {
     switch (this.currentWeather) {
       case 'sunny':
-        return 'Sunny';
+        return 'রোদেলা';
       case 'cloudy':
-        return 'Cloudy';
+        return 'মেঘলা';
       case 'rainy':
-        return 'Rainy';
+        return 'বৃষ্টি';
       case 'heavy_rain':
-        return 'Heavy Rain';
+        return 'ভারী বৃষ্টি';
       case 'thunderstorm':
-        return 'Thunderstorm';
+        return 'বজ্রবৃষ্টি';
       case 'fog':
-        return 'Morning Fog';
+        return 'কুয়াশা';
     }
   }
 

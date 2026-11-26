@@ -12,6 +12,7 @@ export interface HumanRig {
   leftLeg: THREE.Group;
   rightLeg: THREE.Group;
   lungiSkirt: THREE.Mesh;
+  sareeSkirt: THREE.Mesh | null;
   panjabiSkirt: THREE.Mesh;
   gamchaMesh: THREE.Mesh;
   batMesh: THREE.Group;
@@ -64,12 +65,12 @@ export function buildHumanRig(
   shadowPlane.position.y = 0.02;
   root.add(shadowPlane);
 
-  // Legs with calves & sandals
+  // Legs with calves & sandals (kept slightly compact on thighs so cloth wraps cleanly)
   const makeLeg = (sideX: number) => {
     const legGroup = new THREE.Group();
     legGroup.position.set(sideX, 0.8, 0);
     const thigh = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.088, 0.24, 5, 10),
+      new THREE.CapsuleGeometry(0.074, 0.24, 5, 10),
       options.hasLungi || options.hasSaree ? skinMat : pantsMat
     );
     thigh.position.y = -0.19;
@@ -77,7 +78,7 @@ export function buildHumanRig(
     legGroup.add(thigh);
 
     const calf = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.068, 0.24, 5, 10),
+      new THREE.CapsuleGeometry(0.06, 0.24, 5, 10),
       options.hasLungi || options.hasSaree ? skinMat : pantsMat
     );
     calf.position.y = -0.52;
@@ -91,8 +92,8 @@ export function buildHumanRig(
     bodyPivot.add(legGroup);
     return legGroup;
   };
-  const leftLeg = makeLeg(-0.115);
-  const rightLeg = makeLeg(0.115);
+  const leftLeg = makeLeg(-0.105);
+  const rightLeg = makeLeg(0.105);
 
   // Shaped Torso & Neck
   const torso = new THREE.Mesh(
@@ -108,12 +109,18 @@ export function buildHumanRig(
   neck.position.y = 1.42;
   bodyPivot.add(neck);
 
-  // Lungi Wrap Cylinder
+  // Waist-Pivoted Pleated Lungi Wrap (pivots from waist y=0.86 down to y=0.22)
+  const lungiGeo = new THREE.CylinderGeometry(0.2, 0.265, 0.64, 16);
+  lungiGeo.translate(0, -0.32, 0);
   const lungiSkirt = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.2, 0.23, 0.62, 14),
-    new THREE.MeshStandardMaterial({ map: textures.lungiBlue, roughness: 0.84 })
+    lungiGeo,
+    new THREE.MeshStandardMaterial({
+      map: textures.lungiBlue,
+      roughness: 0.84,
+      side: THREE.DoubleSide,
+    })
   );
-  lungiSkirt.position.y = 0.56;
+  lungiSkirt.position.y = 0.86;
   lungiSkirt.castShadow = true;
   lungiSkirt.visible = Boolean(options.hasLungi);
   bodyPivot.add(lungiSkirt);
@@ -137,15 +144,23 @@ export function buildHumanRig(
   gamchaMesh.visible = Boolean(options.hasGamcha);
   bodyPivot.add(gamchaMesh);
 
-  // Female Saree / Orna Drape
+  // Female Saree / Orna Drape (waist-pivoted so saree moves with legs)
+  let sareeSkirt: THREE.Mesh | null = null;
   if (options.hasSaree) {
-    const sareeMesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.2, 0.25, 0.78, 14),
-      new THREE.MeshStandardMaterial({ map: textures.sareePattern, color: options.shirtHex, roughness: 0.78 })
+    const sareeGeo = new THREE.CylinderGeometry(0.2, 0.27, 0.74, 16);
+    sareeGeo.translate(0, -0.37, 0);
+    sareeSkirt = new THREE.Mesh(
+      sareeGeo,
+      new THREE.MeshStandardMaterial({
+        map: textures.sareePattern,
+        color: options.shirtHex,
+        roughness: 0.78,
+        side: THREE.DoubleSide,
+      })
     );
-    sareeMesh.position.y = 0.52;
-    sareeMesh.castShadow = true;
-    bodyPivot.add(sareeMesh);
+    sareeSkirt.position.y = 0.86;
+    sareeSkirt.castShadow = true;
+    bodyPivot.add(sareeSkirt);
 
     const orna = new THREE.Mesh(
       new THREE.BoxGeometry(0.44, 0.52, 0.25),
@@ -287,6 +302,7 @@ export function buildHumanRig(
     leftLeg,
     rightLeg,
     lungiSkirt,
+    sareeSkirt,
     panjabiSkirt,
     gamchaMesh,
     batMesh,
@@ -331,6 +347,7 @@ export class PlayerAnimation {
     holdingGun: boolean
   ): void {
     rig.gunMesh.visible = holdingGun && !isDriving && !rig.batMesh.visible;
+    const cloth = rig.lungiSkirt.visible ? rig.lungiSkirt : rig.sareeSkirt;
 
     if (isDriving) {
       rig.bodyPivot.position.y = 0.12;
@@ -338,6 +355,11 @@ export class PlayerAnimation {
       rig.rightLeg.rotation.x = -Math.PI / 2.4;
       rig.leftArm.rotation.x = -0.85;
       rig.rightArm.rotation.x = -0.85;
+      if (cloth) {
+        cloth.rotation.x = -1.05;
+        cloth.rotation.z = 0;
+        cloth.scale.set(1.08, 0.88, 1.35);
+      }
       return;
     }
 
@@ -347,6 +369,11 @@ export class PlayerAnimation {
       rig.rightLeg.rotation.x = THREE.MathUtils.damp(rig.rightLeg.rotation.x, -Math.PI / 2.1, 12, dt);
       rig.leftArm.rotation.x = THREE.MathUtils.damp(rig.leftArm.rotation.x, -0.3, 10, dt);
       rig.rightArm.rotation.x = THREE.MathUtils.damp(rig.rightArm.rotation.x, -0.3, 10, dt);
+      if (cloth) {
+        cloth.rotation.x = THREE.MathUtils.damp(cloth.rotation.x, -0.95, 12, dt);
+        cloth.rotation.z = THREE.MathUtils.damp(cloth.rotation.z, 0, 12, dt);
+        cloth.scale.set(1.08, 0.9, 1.32);
+      }
       return;
     }
 
@@ -365,9 +392,14 @@ export class PlayerAnimation {
       return;
     }
     if (combatAction === 'kick') {
-      const swing = Math.sin((combatTimer / 0.34) * Math.PI) * 1.35;
+      const kickArc = Math.sin((combatTimer / 0.34) * Math.PI);
+      const swing = kickArc * (cloth ? 0.95 : 1.35);
       rig.rightLeg.rotation.x = -swing;
       rig.leftArm.rotation.x = -0.5;
+      if (cloth) {
+        cloth.rotation.x = -kickArc * 0.52;
+        cloth.scale.set(1.04, 0.85, 1 + kickArc * 0.85);
+      }
       return;
     }
     if (combatAction === 'block') {
@@ -382,20 +414,41 @@ export class PlayerAnimation {
     rig.rightArm.rotation.z = THREE.MathUtils.damp(rig.rightArm.rotation.z, -0.08, 10, dt);
 
     if (!isGrounded) {
-      rig.leftLeg.rotation.x = THREE.MathUtils.damp(rig.leftLeg.rotation.x, 0.45, 10, dt);
-      rig.rightLeg.rotation.x = THREE.MathUtils.damp(rig.rightLeg.rotation.x, -0.35, 10, dt);
+      const airAmp = cloth ? 0.28 : 0.45;
+      rig.leftLeg.rotation.x = THREE.MathUtils.damp(rig.leftLeg.rotation.x, airAmp, 10, dt);
+      rig.rightLeg.rotation.x = THREE.MathUtils.damp(rig.rightLeg.rotation.x, -airAmp * 0.8, 10, dt);
       rig.leftArm.rotation.x = THREE.MathUtils.damp(rig.leftArm.rotation.x, -0.6, 10, dt);
       rig.rightArm.rotation.x = THREE.MathUtils.damp(rig.rightArm.rotation.x, holdingGun ? -1.45 : -0.6, 10, dt);
+      if (cloth) {
+        cloth.rotation.x = THREE.MathUtils.damp(cloth.rotation.x, -0.1, 10, dt);
+        cloth.scale.z = THREE.MathUtils.damp(cloth.scale.z, 1.48, 10, dt);
+      }
       return;
     }
 
     if (speed > 0.25) {
       this.walkPhase += dt * (4.8 + speed * 0.95);
-      const amp = Math.min(0.85, speed * 0.14);
-      rig.leftLeg.rotation.x = Math.sin(this.walkPhase) * amp;
-      rig.rightLeg.rotation.x = -Math.sin(this.walkPhase) * amp;
-      rig.leftArm.rotation.x = -Math.sin(this.walkPhase) * amp * 0.8;
-      rig.rightArm.rotation.x = holdingGun ? -1.35 : Math.sin(this.walkPhase) * amp * 0.8;
+      const stride = Math.sin(this.walkPhase);
+      // Keep leg swing inside the flowing lungi envelope so legs never poke out of the cloth
+      const maxAmp = cloth ? 0.38 : 0.82;
+      const amp = Math.min(maxAmp, speed * (cloth ? 0.068 : 0.14));
+      rig.leftLeg.rotation.x = stride * amp;
+      rig.rightLeg.rotation.x = -stride * amp;
+      const armAmp = Math.min(0.7, speed * 0.12);
+      rig.leftArm.rotation.x = -stride * armAmp * 0.8;
+      rig.rightArm.rotation.x = holdingGun ? -1.35 : stride * armAmp * 0.8;
+
+      if (cloth) {
+        const stretch = Math.abs(stride) * Math.min(1, speed / 5.5);
+        const crouchScaleY = posture === 'crouching' ? 0.78 : 1;
+        cloth.scale.set(
+          1 - stretch * 0.07,
+          crouchScaleY,
+          1 + stretch * 0.78
+        );
+        cloth.rotation.x = Math.sin(this.walkPhase * 2) * 0.06 - (posture === 'crouching' ? 0.15 : 0);
+        cloth.rotation.z = Math.cos(this.walkPhase) * 0.065 * Math.min(1, speed / 5);
+      }
     } else {
       rig.leftLeg.rotation.x = THREE.MathUtils.damp(rig.leftLeg.rotation.x, 0, 12, dt);
       rig.rightLeg.rotation.x = THREE.MathUtils.damp(rig.rightLeg.rotation.x, 0, 12, dt);
@@ -406,6 +459,14 @@ export class PlayerAnimation {
         12,
         dt
       );
+      if (cloth) {
+        const crouchScaleY = posture === 'crouching' ? 0.78 : 1;
+        cloth.scale.x = THREE.MathUtils.damp(cloth.scale.x, 1, 10, dt);
+        cloth.scale.y = THREE.MathUtils.damp(cloth.scale.y, crouchScaleY, 10, dt);
+        cloth.scale.z = THREE.MathUtils.damp(cloth.scale.z, posture === 'crouching' ? 1.2 : 1, 10, dt);
+        cloth.rotation.x = THREE.MathUtils.damp(cloth.rotation.x, posture === 'crouching' ? -0.2 : 0, 10, dt);
+        cloth.rotation.z = THREE.MathUtils.damp(cloth.rotation.z, 0, 10, dt);
+      }
     }
   }
 }

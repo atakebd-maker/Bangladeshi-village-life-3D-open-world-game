@@ -8,7 +8,7 @@ export class FootballSystem {
     active: false,
     goals: 0,
     shots: 0,
-    lastEvent: 'Dribble or kick the ball into either goal!',
+    lastEvent: 'বল নিয়ে ড্রিবল করুন বা গোলপোস্টে কিক মারুন!',
   };
 
   private pos = new THREE.Vector3(-34, 0.22, 88);
@@ -30,7 +30,7 @@ export class FootballSystem {
     const fz = Math.cos(playerRotY);
     this.vel.set(fx * 14, 4.2, fz * 14);
     this.state.shots++;
-    this.state.lastEvent = 'Shot fired!';
+    this.state.lastEvent = 'জোরালো শট!';
     audio.playPunchOrKick(true);
   }
 
@@ -38,7 +38,6 @@ export class FootballSystem {
     const distToPitch = Math.hypot(playerX - -34, playerZ - 88);
     this.state.active = distToPitch < 24;
 
-    // Gentle dribble when walking into the ball
     const dx = this.pos.x - playerX;
     const dz = this.pos.z - playerZ;
     const dist = Math.hypot(dx, dz);
@@ -60,15 +59,13 @@ export class FootballSystem {
     this.ballMesh.rotation.x += this.vel.z * dt * 2.5;
     this.ballMesh.rotation.z -= this.vel.x * dt * 2.5;
 
-    // Goal check at x < -51 or x > -17 within z in [85.4, 90.6]
     if ((this.pos.x < -51 || this.pos.x > -17) && this.pos.z > 85.4 && this.pos.z < 90.6) {
       this.state.goals++;
-      this.state.lastEvent = `GOAL! Total Village Goals: ${this.state.goals}`;
+      this.state.lastEvent = `গোল! মোট গোল: ${this.state.goals}`;
       this.pos.set(-34, 0.22, 88);
       this.vel.set(0, 0, 0);
     }
 
-    // Keep ball inside pitch outer bounds
     if (this.pos.x < -54 || this.pos.x > -14 || this.pos.z < 75 || this.pos.z > 101) {
       this.pos.set(-34, 0.22, 88);
       this.vel.set(0, 0, 0);

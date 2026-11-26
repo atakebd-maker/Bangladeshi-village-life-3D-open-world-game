@@ -82,7 +82,7 @@ export class NPCController {
     // 1. Key Named Villagers with unique 3-choice dialogues
     addNpc(
       'npc-rahim',
-      'Rahim Mia',
+      'রহিম মিয়া',
       30,
       12.8,
       'work',
@@ -93,7 +93,7 @@ export class NPCController {
     );
     addNpc(
       'npc-karim',
-      'Karim Chacha',
+      'করিম চাচা',
       -34,
       -62,
       'work',
@@ -104,7 +104,7 @@ export class NPCController {
     );
     addNpc(
       'npc-salma',
-      'Salma Begum',
+      'সালমা বেগম',
       -18,
       3,
       'walk',
@@ -119,7 +119,7 @@ export class NPCController {
     );
     addNpc(
       'npc-tariq',
-      'Tariq (Captain)',
+      'তারিক (অধিনায়ক)',
       18,
       72,
       'cricket',
@@ -130,7 +130,7 @@ export class NPCController {
     );
     addNpc(
       'npc-rafiq',
-      'Ustad Rafiq',
+      'ওস্তাদ রফিক',
       77,
       -12,
       'work',
@@ -141,7 +141,7 @@ export class NPCController {
     );
     addNpc(
       'npc-imam',
-      'Hafez Yunus',
+      'হাফেজ ইউনুস',
       24,
       -11,
       'talk',
@@ -155,7 +155,7 @@ export class NPCController {
     );
     addNpc(
       'npc-teacher',
-      'Master Anisur',
+      'মাস্টার আনিসুর',
       -14,
       -76,
       'talk',
@@ -169,7 +169,7 @@ export class NPCController {
     );
     addNpc(
       'npc-fisherman',
-      'Jele Monir',
+      'জেলে মনির',
       -62,
       8,
       'work',
@@ -180,7 +180,7 @@ export class NPCController {
     );
     addNpc(
       'npc-police',
-      'SI Faruk',
+      'এসআই ফারুক',
       75,
       30,
       'talk',
@@ -196,7 +196,7 @@ export class NPCController {
     // 2. Additional Lively Villagers, Youth, Shoppers & Students (22+ total NPCs)
     addNpc(
       'npc-child-1',
-      'Rafi (Student)',
+      'রাফি (ছাত্র)',
       -11,
       -73,
       'walk',
@@ -209,7 +209,7 @@ export class NPCController {
     );
     addNpc(
       'npc-child-2',
-      'Mitu (Student)',
+      'মিতু (ছাত্রী)',
       -16,
       -71,
       'walk',
@@ -221,7 +221,7 @@ export class NPCController {
     );
     addNpc(
       'npc-shopper-1',
-      'Hasan Mia',
+      'হাসান মিয়া',
       38,
       7,
       'walk',
@@ -237,7 +237,7 @@ export class NPCController {
     );
     addNpc(
       'npc-shopper-2',
-      'Ayesha Begum',
+      'আয়েশা বেগম',
       42,
       19,
       'walk',
@@ -251,7 +251,7 @@ export class NPCController {
     );
     addNpc(
       'npc-bus-waiter',
-      'Traveler Jamal',
+      'যাত্রী জামাল',
       59.5,
       48,
       'sit',
@@ -261,7 +261,7 @@ export class NPCController {
     );
     addNpc(
       'npc-road-walker-1',
-      'Kamal Uddin',
+      'কামাল উদ্দিন',
       -2,
       6,
       'walk',
@@ -277,7 +277,7 @@ export class NPCController {
     );
     addNpc(
       'npc-road-walker-2',
-      'Nusrat Jahan',
+      'নুসরাত জাহান',
       12,
       -10,
       'walk',
@@ -290,7 +290,7 @@ export class NPCController {
     );
     addNpc(
       'npc-tea-patron-1',
-      'Babul Bhai',
+      'বাবুল ভাই',
       29,
       11.5,
       'sit',
@@ -301,7 +301,7 @@ export class NPCController {
     );
     addNpc(
       'npc-bazaar-vendor-1',
-      'Fish Seller Kuddus',
+      'মাছ বিক্রেতা কুদ্দুস',
       34,
       -0.8,
       'work',
@@ -312,7 +312,7 @@ export class NPCController {
     );
     addNpc(
       'npc-bazaar-vendor-2',
-      'Grocer Salam',
+      'মুদি দোকানি সালাম',
       40,
       12.8,
       'work',
@@ -322,7 +322,7 @@ export class NPCController {
     );
     addNpc(
       'npc-farmer-2',
-      'Farmer Mokles',
+      'কৃষক মোকলেস',
       98,
       -42,
       'work',
@@ -333,7 +333,7 @@ export class NPCController {
     );
     addNpc(
       'npc-footballer-1',
-      'Sohel (Striker)',
+      'সোহেল (স্ট্রাইকার)',
       -26,
       86,
       'walk',
@@ -347,7 +347,7 @@ export class NPCController {
     );
     addNpc(
       'npc-footballer-2',
-      'Rashed (Keeper)',
+      'রাশেদ (গোলরক্ষক)',
       -48,
       88,
       'talk',

@@ -19,12 +19,12 @@ export class CarController {
     const wheelR = isHeavy ? 0.46 : 0.36;
 
     const labelMap: Record<typeof kind, string> = {
-      car: 'Sedan Car',
-      jeep: 'Patrol Jeep 4x4',
-      pickup: 'Cargo Pickup',
-      microbus: 'Village Microbus',
-      local_bus: 'Bangla Highway Bus',
-      truck: 'Cargo Truck',
+      car: 'প্রাইভেট কার',
+      jeep: 'পুলিশ জিপ ৪x৪',
+      pickup: 'পিকআপ ভ্যান',
+      microbus: 'মাইক্রোবাস',
+      local_bus: 'বাংলাদেশি হাইওয়ে বাস',
+      truck: 'কার্গো ট্রাক',
     };
 
     const veh = new VehicleEntity(

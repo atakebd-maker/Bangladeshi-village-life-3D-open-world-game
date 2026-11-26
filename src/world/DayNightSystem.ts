@@ -91,21 +91,20 @@ export class DayNightSystem {
   public getTimeLabel(): string {
     const h = Math.floor(this.timeHours) % 24;
     const m = Math.floor((this.timeHours % 1) * 60);
-    const period = h >= 12 ? 'PM' : 'AM';
     const h12 = h % 12 === 0 ? 12 : h % 12;
     const phase =
       h >= 5 && h < 7
-        ? 'Sunrise'
+        ? 'ভোর'
         : h >= 7 && h < 11
-          ? 'Morning'
+          ? 'সকাল'
           : h >= 11 && h < 15
-            ? 'Noon'
+            ? 'দুপুর'
             : h >= 15 && h < 17
-              ? 'Afternoon'
+              ? 'বিকাল'
               : h >= 17 && h < 19
-                ? 'Sunset'
-                : 'Night';
-    return `${phase} · ${h12}:${String(m).padStart(2, '0')} ${period}`;
+                ? 'সন্ধ্যা'
+                : 'রাত';
+    return `${phase} · ${h12}:${String(m).padStart(2, '0')}`;
   }
 
   public update(

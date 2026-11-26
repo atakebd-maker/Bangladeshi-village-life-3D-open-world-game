@@ -15,29 +15,35 @@ interface SettingsProps {
 }
 
 const GRAPHICS_OPTS: Array<{ id: GraphicsQuality; label: string; desc: string }> = [
-  { id: 'low', label: 'Low', desc: 'Fastest mobile frame rate, shadows off' },
-  { id: 'medium', label: 'Medium', desc: 'Balanced resolution & soft shadows' },
-  { id: 'high', label: 'High', desc: 'Crisp PBR details & wide draw distance' },
-  { id: 'ultra', label: 'Ultra', desc: 'Maximum native pixel density & horizon' },
+  { id: 'low', label: 'কম (Low)', desc: 'সর্বোচ্চ স্পিড, শ্যাডো বন্ধ' },
+  { id: 'medium', label: 'মাঝারি (Medium)', desc: 'সুষম রেজোলিউশন ও সফট শ্যাডো' },
+  { id: 'high', label: 'উচ্চ (High)', desc: 'স্পষ্ট ৩ডি ডিটেইলস ও দূরের দৃশ্য' },
+  { id: 'ultra', label: 'আল্ট্রা (Ultra)', desc: 'সর্বোচ্চ নেটিভ গ্রাফিক্স ও শ্যাডো' },
 ];
 
 const TIME_OPTS: Array<{ id: TimeOfDayPreset; label: string }> = [
-  { id: 'sunrise', label: 'Sunrise' },
-  { id: 'morning', label: 'Morning' },
-  { id: 'noon', label: 'Noon' },
-  { id: 'afternoon', label: 'Afternoon' },
-  { id: 'sunset', label: 'Sunset' },
-  { id: 'night', label: 'Night' },
+  { id: 'sunrise', label: 'ভোর' },
+  { id: 'morning', label: 'সকাল' },
+  { id: 'noon', label: 'দুপুর' },
+  { id: 'afternoon', label: 'বিকাল' },
+  { id: 'sunset', label: 'সন্ধ্যা' },
+  { id: 'night', label: 'রাত' },
 ];
 
 const WEATHER_OPTS: Array<{ id: WeatherPreset; label: string }> = [
-  { id: 'sunny', label: 'Sunny' },
-  { id: 'cloudy', label: 'Cloudy' },
-  { id: 'rainy', label: 'Rainy' },
-  { id: 'heavy_rain', label: 'Heavy Rain' },
-  { id: 'thunderstorm', label: 'Thunderstorm' },
-  { id: 'fog', label: 'Fog' },
+  { id: 'sunny', label: 'রোদেলা' },
+  { id: 'cloudy', label: 'মেঘলা' },
+  { id: 'rainy', label: 'বৃষ্টি' },
+  { id: 'heavy_rain', label: 'ভারী বৃষ্টি' },
+  { id: 'thunderstorm', label: 'ঝড়-বজ্রপাত' },
+  { id: 'fog', label: 'কুয়াশা' },
 ];
+
+const TAB_LABELS: Record<'graphics' | 'sound' | 'world', string> = {
+  graphics: 'গ্রাফিক্স',
+  sound: 'সাউন্ড',
+  world: 'সময় ও আবহাওয়া',
+};
 
 export const Settings: React.FC<SettingsProps> = ({
   settings,
@@ -57,14 +63,14 @@ export const Settings: React.FC<SettingsProps> = ({
         <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3.5">
           <div className="flex items-center gap-2">
             <h2 className="font-display text-lg font-bold tracking-wide text-white">
-              Game Settings
+              গেম সেটিংস
             </h2>
             <span className="text-xs text-slate-400">· TAHSIN STUDIO</span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close settings"
+            aria-label="সেটিংস বন্ধ করুন"
             className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 hover:border-slate-500 hover:text-white"
           >
             <X className="h-4 w-4" />
@@ -77,13 +83,13 @@ export const Settings: React.FC<SettingsProps> = ({
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={`rounded-lg px-4 py-1.5 text-xs font-semibold capitalize transition whitespace-nowrap ${
+              className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
                 tab === t
                   ? 'bg-emerald-600 text-white'
                   : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800'
               }`}
             >
-              {t === 'world' ? 'Time & Weather' : t}
+              {TAB_LABELS[t]}
             </button>
           ))}
         </div>
@@ -92,8 +98,8 @@ export const Settings: React.FC<SettingsProps> = ({
           {tab === 'graphics' && (
             <div className="space-y-4">
               <div>
-                <p className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Graphics Quality Preset
+                <p className="mb-2 text-xs font-semibold text-slate-400 tracking-wider">
+                  গ্রাফিক্স কোয়ালিটি
                 </p>
                 <div className="grid grid-cols-2 gap-2.5">
                   {GRAPHICS_OPTS.map((opt) => (
@@ -116,7 +122,7 @@ export const Settings: React.FC<SettingsProps> = ({
 
               <div>
                 <div className="mb-1.5 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-300">Camera Sensitivity</span>
+                  <span className="font-semibold text-slate-300">ক্যামেরা সেনসিটিভিটি</span>
                   <span className="font-mono-num text-amber-400">
                     {settings.cameraSensitivity.toFixed(1)}x
                   </span>
@@ -137,9 +143,9 @@ export const Settings: React.FC<SettingsProps> = ({
           {tab === 'sound' && (
             <div className="space-y-4">
               {[
-                { key: 'masterVolume' as const, label: 'Master Volume' },
-                { key: 'ambientVolume' as const, label: 'Nature & Village Ambience' },
-                { key: 'sfxVolume' as const, label: 'Vehicles, Cricket & Actions' },
+                { key: 'masterVolume' as const, label: 'মাস্টার ভলিউম' },
+                { key: 'ambientVolume' as const, label: 'প্রকৃতি ও গ্রামের পরিবেশের শব্দ' },
+                { key: 'sfxVolume' as const, label: 'গাড়ি, বন্দুক, দরজা ও অ্যাকশন সাউন্ড' },
               ].map((s) => (
                 <div key={s.key}>
                   <div className="mb-1.5 flex items-center justify-between text-xs">
@@ -166,7 +172,7 @@ export const Settings: React.FC<SettingsProps> = ({
             <div className="space-y-4">
               <label className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2.5">
                 <span className="text-sm font-medium text-slate-200">
-                  Automatic Day-Night Cycle
+                  স্বয়ংক্রিয় দিন-রাত পরিবর্তন
                 </span>
                 <input
                   type="checkbox"
@@ -177,8 +183,8 @@ export const Settings: React.FC<SettingsProps> = ({
               </label>
 
               <div>
-                <p className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Time of Day
+                <p className="mb-2 text-xs font-semibold text-slate-400 tracking-wider">
+                  দিনের সময়
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {TIME_OPTS.map((t) => (
@@ -199,8 +205,8 @@ export const Settings: React.FC<SettingsProps> = ({
               </div>
 
               <div>
-                <p className="mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Weather Condition
+                <p className="mb-2 text-xs font-semibold text-slate-400 tracking-wider">
+                  আবহাওয়ার অবস্থা
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {WEATHER_OPTS.map((w) => (

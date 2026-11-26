@@ -10,7 +10,7 @@ import { MainMenu } from './ui/MainMenu';
 import { Settings } from './ui/Settings';
 
 const INITIAL_HUD: HudSnapshot = {
-  locationName: 'Shonargaon Homesteads',
+  locationName: 'সোনারগাঁও বসতবাড়ি',
   playerX: 0,
   playerZ: 8,
   playerHeading: 0,
@@ -32,8 +32,8 @@ const INITIAL_HUD: HudSnapshot = {
   totalMissions: 5,
   cricket: {
     active: false,
-    teamName: 'Shonargaon Tigers',
-    opponentName: 'Padma Strikers',
+    teamName: 'সোনারগাঁও টাইগার্স',
+    opponentName: 'পদ্মা স্ট্রাইকার্স',
     runs: 0,
     wickets: 0,
     ballsBowled: 0,
@@ -46,8 +46,8 @@ const INITIAL_HUD: HudSnapshot = {
   football: { active: false, goals: 0, shots: 0, lastEvent: '' },
   inventory: [],
   outfit: 'lungi_genji',
-  timeLabel: 'Morning · 9:12 AM',
-  weatherLabel: 'Sunny',
+  timeLabel: 'সকাল · ৯:১২',
+  weatherLabel: 'রোদেলা',
   markers: [],
 };
 
@@ -64,7 +64,7 @@ async function tryRequestLandscape(): Promise<void> {
       await orientation.lock('landscape');
     }
   } catch {
-    // Browsers only allow orientation lock in installed PWAs / fullscreen / native Android WebView
+    // ব্রাউজার কেবল ফুলস্ক্রিন বা অ্যান্ড্রয়েড অ্যাপে ল্যান্ডস্কেপ লক অনুমোদন করে
   }
 }
 
@@ -78,7 +78,7 @@ export default function App() {
   const [screen, setScreen] = useState<GameScreenState>('intro');
   const [loadProgress, setLoadProgress] = useState<LoadingProgress>({
     percent: 0,
-    stage: 'Preparing village world...',
+    stage: 'সোনারগাঁও গ্রাম প্রস্তুত হচ্ছে...',
   });
   const [hud, setHud] = useState<HudSnapshot>(INITIAL_HUD);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
@@ -86,7 +86,7 @@ export default function App() {
   const [settingsState, setSettingsState] = useState<GameSettings>(() => SaveManager.load().settings);
   const [contextLost, setContextLost] = useState<boolean>(false);
 
-  // Mount Three.js 3D Engine once
+  // থ্রি.জেএস ইঞ্জিন মাউন্ট
   useEffect(() => {
     const mount = canvasMountRef.current;
     if (!mount) return;
@@ -129,22 +129,27 @@ export default function App() {
     }
 
     setScreen('loading');
-    let pct = 12;
-    setLoadProgress({ percent: pct, stage: 'Entering Shonargaon Village...' });
+    let pct = 0;
+    setLoadProgress({ percent: 0, stage: 'সোনারগাঁও গ্রামের রাস্তাঘাট তৈরি হচ্ছে...' });
     clearInterval(loadTimerRef.current);
+    // ঠিক ১০ সেকেন্ডের লোডিং সময় (১০০ মিলিসেকেন্ড x ১০০ ধাপ = ১০,০০০ মিলিসেকেন্ড)
     loadTimerRef.current = window.setInterval(() => {
-      pct += 18;
-      if (pct < 55) {
-        setLoadProgress({ percent: pct, stage: 'Loading roads, bazaar & river...' });
-      } else if (pct < 92) {
-        setLoadProgress({ percent: pct, stage: 'Spawning villagers, vehicles & animals...' });
+      pct += 1;
+      if (pct < 25) {
+        setLoadProgress({ percent: pct, stage: 'সোনারগাঁও গ্রামের রাস্তাঘাট তৈরি হচ্ছে...' });
+      } else if (pct < 50) {
+        setLoadProgress({ percent: pct, stage: 'বাড়িঘর, বাজার, মসজিদ ও স্কুল লোড হচ্ছে...' });
+      } else if (pct < 75) {
+        setLoadProgress({ percent: pct, stage: 'গাড়ি, রিকশা, গ্রামবাসী ও পশুপাখি যুক্ত হচ্ছে...' });
+      } else if (pct < 100) {
+        setLoadProgress({ percent: pct, stage: 'আবহাওয়া, পদ্মা নদী ও সাউন্ড সেটআপ হচ্ছে...' });
       } else {
         clearInterval(loadTimerRef.current);
-        setLoadProgress({ percent: 100, stage: 'Ready' });
+        setLoadProgress({ percent: 100, stage: 'প্রস্তুত! সোনারগাঁও গ্রামে স্বাগতম' });
         gm.setPlayingMode(true);
         setScreen('playing');
       }
-    }, 240);
+    }, 100);
   };
 
   const handleSettingsChange = (next: GameSettings) => {
@@ -161,22 +166,21 @@ export default function App() {
     try {
       window.close();
     } catch {
-      // Browsers prevent closing non-scripted tabs; show clean exited screen
+      // ব্রাউজার ট্যাব বন্ধ না হলে এক্সিট স্ক্রিন দেখাবে
     }
     setScreen('exited');
   };
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#070b12]">
-      {/* Dedicated isolated WebGL mount */}
       <div ref={canvasMountRef} className="absolute inset-0 h-full w-full" />
 
       {contextLost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-6 text-center">
           <div className="max-w-sm rounded-xl border border-slate-700 bg-slate-900 p-6">
-            <h2 className="font-display text-lg font-bold text-white">Graphics Context Paused</h2>
+            <h2 className="font-display text-lg font-bold text-white">গ্রাফিক্স রিস্টোর হচ্ছে</h2>
             <p className="mt-2 text-xs text-slate-300">
-              Restoring WebGL 3D scene resources...
+              থ্রিডি দৃশ্য পুনরায় চালু হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...
             </p>
           </div>
         </div>
@@ -235,17 +239,17 @@ export default function App() {
             TAHSIN STUDIO
           </p>
           <h1 className="font-display mt-3 text-2xl font-bold text-white sm:text-4xl">
-            BANGLADESH VILLAGE LIFE 3D
+            বাংলাদেশ ভিলেজ লাইফ 3D
           </h1>
           <p className="mt-3 max-w-sm text-xs text-slate-300">
-            Progress saved. Thank you for exploring Shonargaon Village!
+            আপনার অগ্রগতি সেভ করা হয়েছে। খেলার জন্য ধন্যবাদ!
           </p>
           <button
             type="button"
             onClick={() => setScreen('menu')}
             className="mt-6 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-bold text-slate-950 shadow-lg hover:bg-emerald-400"
           >
-            Relaunch Game
+            পুনরায় খেলুন
           </button>
         </div>
       )}

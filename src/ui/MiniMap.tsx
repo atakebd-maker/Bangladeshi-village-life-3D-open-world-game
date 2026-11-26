@@ -118,7 +118,7 @@ export const MiniMap: React.FC<MiniMapProps> = ({
   return (
     <div className="relative h-[86px] w-[86px] sm:h-[104px] sm:w-[104px] select-none">
       <div className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-black/80 px-1.5 py-[1px] text-[9px] font-black leading-none text-white border border-white/50">
-        N
+        উ
       </div>
       <canvas
         ref={canvasRef}

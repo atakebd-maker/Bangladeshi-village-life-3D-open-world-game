@@ -22,7 +22,7 @@ export const DEFAULT_SAVE_DATA: SaveData = {
   completedMissionIds: [],
   cricketHighScore: 0,
   footballGoals: 0,
-  inventory: ['Bamboo Hand Fan'],
+  inventory: ['বাঁশের হাতপাখা'],
   settings: { ...DEFAULT_SETTINGS },
 };
 
