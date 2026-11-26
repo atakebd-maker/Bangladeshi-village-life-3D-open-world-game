@@ -1,6 +1,7 @@
 import { GameSettings, SaveData } from '../types/game';
 
 const STORAGE_KEY = 'bd_village_life_3d_save_v1';
+const BACKUP_KEY = 'bd_village_life_3d_backup_v1';
 
 export const DEFAULT_SETTINGS: GameSettings = {
   graphics: 'high',
@@ -29,7 +30,9 @@ export const DEFAULT_SAVE_DATA: SaveData = {
 export class SaveManager {
   public static load(): SaveData {
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const raw =
+        window.localStorage.getItem(STORAGE_KEY) ||
+        window.localStorage.getItem(BACKUP_KEY);
       if (!raw) return { ...DEFAULT_SAVE_DATA, settings: { ...DEFAULT_SETTINGS } };
       const parsed = JSON.parse(raw) as Partial<SaveData>;
       return {
@@ -53,7 +56,9 @@ export class SaveManager {
 
   public static save(data: SaveData): void {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      const serialized = JSON.stringify(data);
+      window.localStorage.setItem(STORAGE_KEY, serialized);
+      window.localStorage.setItem(BACKUP_KEY, serialized);
     } catch {
       // Ignore storage quota errors in restricted webviews
     }

@@ -35,7 +35,8 @@ export type VehicleKind =
   | 'pickup'
   | 'microbus'
   | 'local_bus'
-  | 'truck';
+  | 'truck'
+  | 'boat';
 
 export type CameraMode = 'third_person' | 'first_person';
 
@@ -138,6 +139,7 @@ export interface HudSnapshot {
   deathReason: string;
   isDriving: boolean;
   vehicleName: string;
+  vehicleKind: VehicleKind | null;
   speedKmh: number;
   cameraMode: CameraMode;
   posture: 'standing' | 'crouching' | 'sitting' | 'climbing';
@@ -152,6 +154,7 @@ export interface HudSnapshot {
   outfit: PlayerOutfit;
   timeLabel: string;
   weatherLabel: string;
+  notice: string | null;
   markers: MiniMapMarker[];
 }
 

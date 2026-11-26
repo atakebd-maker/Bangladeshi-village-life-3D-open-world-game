@@ -12,11 +12,12 @@ import {
   Volume2,
 } from 'lucide-react';
 import { GameManager } from '../core/GameManager';
-import { InteractionPrompt, WeaponMode } from '../types/game';
+import { InteractionPrompt, VehicleKind, WeaponMode } from '../types/game';
 
 interface MobileControlsProps {
   gameRef: React.MutableRefObject<GameManager | null>;
   isDriving: boolean;
+  vehicleKind?: VehicleKind | null;
   activePrompt: InteractionPrompt | null;
   cricketActive: boolean;
   weaponMode: WeaponMode;
@@ -71,14 +72,25 @@ const PedalIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
+const BoatIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M3 15c2.5 2.5 5 3.5 9 3.5s6.5-1 9-3.5l-2-4H5l-2 4Z" />
+    <path d="M9 11V7a3 3 0 0 1 6 0v4" />
+    <path d="M2 20c2 1 4 1 6 0s4-1 6 0 4 1 6 0" />
+  </svg>
+);
+
 export const MobileControls: React.FC<MobileControlsProps> = ({
   gameRef,
   isDriving,
+  vehicleKind,
   activePrompt,
   cricketActive,
   weaponMode,
   ammo,
 }) => {
+  const isBoat = vehicleKind === 'boat';
+  const promptIsBoat = activePrompt?.kind === 'vehicle' && activePrompt.id.startsWith('boat-');
   const [knob, setKnob] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [sprintActive, setSprintActive] = useState(false);
   const joyOrigin = useRef<{ x: number; y: number } | null>(null);
@@ -158,10 +170,10 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
       onPointerCancel={handleLookUp}
       className="fixed inset-0 z-0 pointer-events-auto"
     >
-      {/* বাম থাম্ব: ভার্চুয়াল জয়স্টিক অথবা গাড়ির স্টিয়ারিং */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-7 z-10">
+      {/* বাম থাম্ব: ভার্চুয়াল জয়স্টিক অথবা গাড়ি/নৌকার স্টিয়ারিং */}
+      <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-7 z-10">
         {isDriving ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               aria-label="বামে ঘোরান"
@@ -174,9 +186,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ steer: 0 });
               }}
               onPointerLeave={() => setInput({ steer: 0 })}
-              className="flex h-14 w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
+              className="flex h-12 w-13 sm:h-14 sm:w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
             >
-              <ArrowLeft className="h-7 w-7" />
+              <ArrowLeft className="h-6 w-6 sm:h-7 sm:w-7" />
             </button>
             <button
               type="button"
@@ -190,9 +202,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ steer: 0 });
               }}
               onPointerLeave={() => setInput({ steer: 0 })}
-              className="flex h-14 w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
+              className="flex h-12 w-13 sm:h-14 sm:w-16 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white active:scale-95 shadow-lg"
             >
-              <ArrowRight className="h-7 w-7" />
+              <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7" />
             </button>
           </div>
         ) : (
@@ -201,23 +213,23 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             onPointerMove={handleJoyMove}
             onPointerUp={handleJoyUp}
             onPointerCancel={handleJoyUp}
-            className="relative flex h-[112px] w-[112px] sm:h-[124px] sm:w-[124px] items-center justify-center rounded-full border-2 border-white/75 bg-black/25 touch-none shadow-[0_2px_14px_rgba(0,0,0,0.45)]"
+            className="relative flex h-[96px] w-[96px] sm:h-[124px] sm:w-[124px] items-center justify-center rounded-full border-2 border-white/75 bg-black/25 touch-none shadow-[0_2px_14px_rgba(0,0,0,0.45)]"
           >
-            <span className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 text-[10px] leading-none text-white/95">
+            <span className="pointer-events-none absolute top-1.5 sm:top-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] leading-none text-white/95">
               ▲
             </span>
-            <span className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] leading-none text-white/95">
+            <span className="pointer-events-none absolute bottom-1.5 sm:bottom-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] leading-none text-white/95">
               ▼
             </span>
-            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] leading-none text-white/95">
+            <span className="pointer-events-none absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 text-[9px] sm:text-[10px] leading-none text-white/95">
               ◀
             </span>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] leading-none text-white/95">
+            <span className="pointer-events-none absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 text-[9px] sm:text-[10px] leading-none text-white/95">
               ▶
             </span>
 
             <div
-              className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-white bg-gradient-to-b from-white via-slate-200 to-slate-400 shadow-[0_3px_10px_rgba(0,0,0,0.5)]"
+              className="h-9 w-9 sm:h-12 sm:w-12 rounded-full border border-white bg-gradient-to-b from-white via-slate-200 to-slate-400 shadow-[0_3px_10px_rgba(0,0,0,0.5)]"
               style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
             />
           </div>
@@ -225,13 +237,13 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
       </div>
 
       {/* ডান থাম্ব: গোল অ্যাকশন বাটনসমূহ */}
-      <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10">
+      <div className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 z-10">
         {isDriving ? (
-          <div className="flex items-end gap-2.5">
+          <div className="grid grid-cols-2 sm:flex items-end gap-2 sm:gap-2.5">
             <button
               type="button"
-              aria-label="হর্ন"
-              title="হর্ন"
+              aria-label={isBoat ? 'ডাক দিন' : 'হর্ন'}
+              title={isBoat ? 'ডাক দিন' : 'হর্ন'}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ horn: true });
@@ -240,15 +252,28 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ horn: false });
               }}
-              className={`${actionCircle} h-12 w-12`}
+              className={`${actionCircle} h-11 w-11 sm:h-12 sm:w-12 justify-self-end`}
             >
               <Volume2 className="h-5 w-5" />
             </button>
 
             <button
               type="button"
-              aria-label="ব্রেক বা পেছনে"
-              title="ব্রেক / পেছনে"
+              aria-label={isBoat ? 'নৌকা থেকে নামুন' : 'গাড়ি থেকে নামুন'}
+              title={isBoat ? 'নৌকা থেকে নামুন' : 'গাড়ি থেকে নামুন'}
+              onClick={(e) => {
+                e.stopPropagation();
+                setInput({ vehicleToggle: true });
+              }}
+              className={`${actionCircle} h-11 w-11 sm:h-12 sm:w-12 sm:order-4 border-amber-300 bg-amber-500/85 text-slate-950 justify-self-end`}
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+
+            <button
+              type="button"
+              aria-label={isBoat ? 'থামান বা পেছনে' : 'ব্রেক বা পেছনে'}
+              title={isBoat ? 'থামান / পেছনে' : 'ব্রেক / পেছনে'}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ brake: 1 });
@@ -258,16 +283,16 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ brake: 0 });
               }}
               onPointerLeave={() => setInput({ brake: 0 })}
-              className={`${actionCircle} h-14 w-14 border-red-300/85 bg-black/50`}
+              className={`${actionCircle} h-13 w-13 sm:h-14 sm:w-14 border-red-300/85 bg-black/50`}
             >
-              <PedalIcon className="h-5 w-5" />
-              <span className="text-[8px] font-bold">ব্রেক</span>
+              <PedalIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-[8px] font-bold">{isBoat ? 'থামান' : 'ব্রেক'}</span>
             </button>
 
             <button
               type="button"
-              aria-label="গ্যাস বা চালান"
-              title="সামনে চালান"
+              aria-label={isBoat ? 'বৈঠা চালান' : 'গ্যাস বা চালান'}
+              title={isBoat ? 'নৌকা সামনে চালান' : 'সামনে চালান'}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 setInput({ throttle: 1 });
@@ -277,27 +302,18 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setInput({ throttle: 0 });
               }}
               onPointerLeave={() => setInput({ throttle: 0 })}
-              className={`${actionCircle} h-16 w-16 border-white bg-black/45`}
+              className={`${actionCircle} h-14 w-14 sm:h-16 sm:w-16 border-white bg-black/45`}
             >
-              <PedalIcon className="h-6 w-6" />
-              <span className="text-[8px] font-bold">গ্যাস</span>
-            </button>
-
-            <button
-              type="button"
-              aria-label="গাড়ি থেকে নামুন"
-              title="গাড়ি থেকে নামুন"
-              onClick={(e) => {
-                e.stopPropagation();
-                setInput({ vehicleToggle: true });
-              }}
-              className={`${actionCircle} h-12 w-12 border-amber-300 bg-amber-500/85 text-slate-950`}
-            >
-              <LogOut className="h-5 w-5" />
+              {isBoat ? (
+                <BoatIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+              ) : (
+                <PedalIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+              )}
+              <span className="text-[8px] font-bold">{isBoat ? 'বৈঠা' : 'গ্যাস'}</span>
             </button>
           </div>
         ) : (
-          <div className="relative h-[168px] w-[205px] sm:h-[180px] sm:w-[222px]">
+          <div className="relative h-[152px] w-[184px] sm:h-[180px] sm:w-[222px]">
             {/* অস্ত্র পরিবর্তন (ঘুষি / বন্দুক) */}
             <button
               type="button"
@@ -332,9 +348,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ sitToggle: true });
               }}
-              className={`${actionCircle} absolute top-0 left-14 h-11 w-11`}
+              className={`${actionCircle} absolute top-0 left-12 sm:left-14 h-10 w-10 sm:h-11 sm:w-11`}
             >
-              <Armchair className="h-5 w-5" />
+              <Armchair className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
             {/* লাফ (Jump) */}
@@ -346,9 +362,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ jump: true });
               }}
-              className={`${actionCircle} absolute top-0 right-0 h-13 w-13 sm:h-14 sm:w-14`}
+              className={`${actionCircle} absolute top-0 right-0 h-12 w-12 sm:h-14 sm:w-14`}
             >
-              <JumpPersonIcon className="h-7 w-7" />
+              <JumpPersonIcon className="h-6 w-6 sm:h-7 sm:w-7" />
             </button>
 
             {/* লাথি (Kick) */}
@@ -360,9 +376,9 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 e.stopPropagation();
                 setInput({ kick: true });
               }}
-              className={`${actionCircle} absolute top-14 left-0 h-11 w-11`}
+              className={`${actionCircle} absolute top-13 sm:top-14 left-0 h-10 w-10 sm:h-11 sm:w-11`}
             >
-              <Footprints className="h-5 w-5" />
+              <Footprints className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
             {/* দৌড় (Sprint Toggle) */}
@@ -376,14 +392,14 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                 setSprintActive(next);
                 setInput({ sprint: next });
               }}
-              className={`${actionCircle} absolute bottom-0 left-7 h-12 w-12 sm:h-13 sm:w-13 ${
+              className={`${actionCircle} absolute bottom-0 left-6 sm:left-7 h-11 w-11 sm:h-13 sm:w-13 ${
                 sprintActive ? 'border-amber-300 bg-amber-500/85 text-slate-950' : ''
               }`}
             >
-              <RunPersonIcon className="h-6 w-6" />
+              <RunPersonIcon className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
 
-            {/* দরজা / কথা বলা / গাড়ি / ব্যাট অ্যাকশন */}
+            {/* দরজা / কথা বলা / গাড়ি / নৌকা / ব্যাট অ্যাকশন */}
             <button
               type="button"
               aria-label={
@@ -400,7 +416,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                   setInput({ interact: true });
                 }
               }}
-              className={`${actionCircle} absolute top-14 left-14 h-12 w-12 ${
+              className={`${actionCircle} absolute top-12 sm:top-14 left-12 sm:left-14 h-11 w-11 sm:h-12 sm:w-12 ${
                 activePrompt || cricketActive
                   ? 'border-amber-300 bg-amber-500/90 text-slate-950'
                   : ''
@@ -408,6 +424,8 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
             >
               {cricketActive ? (
                 <BatIcon className="h-5 w-5" />
+              ) : promptIsBoat ? (
+                <BoatIcon className="h-5 w-5" />
               ) : activePrompt?.kind === 'vehicle' ? (
                 <Car className="h-5 w-5" />
               ) : activePrompt?.kind === 'door' ? (
@@ -434,7 +452,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({
                   setInput({ punch: true });
                 }
               }}
-              className={`${actionCircle} absolute bottom-8 right-12 h-16 w-16 sm:h-[68px] sm:w-[68px] ${
+              className={`${actionCircle} absolute bottom-7 right-11 sm:bottom-8 sm:right-12 h-14 w-14 sm:h-[68px] sm:w-[68px] ${
                 weaponMode === 'gun' ? 'border-amber-300 bg-black/55' : ''
               }`}
             >

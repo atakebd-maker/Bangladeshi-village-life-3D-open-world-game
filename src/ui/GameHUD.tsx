@@ -75,9 +75,10 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   };
 
   const topCircleBtn =
-    'flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white hover:border-amber-300 active:scale-90 transition shadow-[0_2px_10px_rgba(0,0,0,0.45)] cursor-pointer';
+    'flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full border-2 border-white/80 bg-black/45 text-white hover:border-amber-300 active:scale-90 transition shadow-[0_2px_10px_rgba(0,0,0,0.45)] cursor-pointer';
 
   const missionsList = gameRef.current?.getMissions() ?? [];
+  const activeToast = hud.notice ?? toast;
 
   return (
     <div className="fixed inset-0 z-20 pointer-events-none">
@@ -85,6 +86,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       <MobileControls
         gameRef={gameRef}
         isDriving={hud.isDriving}
+        vehicleKind={hud.vehicleKind}
         activePrompt={hud.activePrompt}
         cricketActive={hud.cricket.active}
         weaponMode={hud.weaponMode}
@@ -92,9 +94,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       />
 
       {/* বাম-উপর: ক্যারেক্টার ছবি + লাল/নীল বার + গোল মিনিম্যাপ */}
-      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-30 flex flex-col items-start gap-2.5 pointer-events-auto">
-        <div className="flex items-center gap-2">
-          <div className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-full border-2 border-white/85 bg-slate-900 shadow-lg">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-30 flex flex-col items-start gap-2 pointer-events-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="h-10 w-10 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-full border-2 border-white/85 bg-slate-900 shadow-lg">
             <img
               src="/assets/aistudio/image_51b664be.png"
               alt="প্লেয়ার"
@@ -102,20 +104,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <div className="relative h-3.5 w-32 sm:w-40 overflow-hidden rounded-sm border border-white/75 bg-black/65 shadow">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
+            <div className="relative h-3 sm:h-3.5 w-24 sm:w-40 overflow-hidden rounded-sm border border-white/75 bg-black/65 shadow">
               <div
                 className="h-full bg-gradient-to-r from-red-600 to-red-500 transition-all duration-150"
                 style={{ width: `${Math.max(0, Math.min(100, hud.health))}%` }}
               />
             </div>
-            <div className="relative h-2.5 w-28 sm:w-36 overflow-hidden rounded-sm border border-white/75 bg-black/65 shadow">
+            <div className="relative h-2 sm:h-2.5 w-20 sm:w-36 overflow-hidden rounded-sm border border-white/75 bg-black/65 shadow">
               <div
                 className="h-full bg-gradient-to-r from-sky-600 to-sky-400 transition-all duration-150"
                 style={{ width: `${Math.max(0, Math.min(100, hud.stamina))}%` }}
               />
             </div>
-            <p className="text-[10px] font-semibold text-white/95 drop-shadow">
+            <p className="max-w-[130px] sm:max-w-none truncate text-[9px] sm:text-[10px] font-semibold text-white/95 drop-shadow">
               {hud.locationName} · {hud.timeLabel} · {hud.weatherLabel}
               {hud.isDriving ? ` · ${hud.speedKmh} কিমি/ঘ` : ''}
             </p>
@@ -139,18 +141,18 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </button>
       </div>
 
-      {/* উপর-মাঝে: হলুদ বর্ডারযুক্ত মিশন ব্যানার (ক্লিক করলে সব মিশন দেখাবে) */}
+      {/* উপর-মাঝে / পোর্ট্রেটে ডান-নিচে: হলুদ বর্ডারযুক্ত মিশন ব্যানার (ক্লিক করলে সব মিশন দেখাবে) */}
       {hud.activeMission && (
         <button
           type="button"
           onClick={() => setMissionsOpen(true)}
-          className="flex absolute top-3 left-1/2 -translate-x-1/2 z-30 items-center gap-1.5 sm:gap-2 rounded-lg border-2 border-amber-400/85 bg-black/75 px-3 sm:px-4 py-1.5 text-center shadow-[0_0_16px_rgba(250,204,21,0.3)] hover:border-amber-300 pointer-events-auto cursor-pointer"
+          className="flex absolute top-14 right-3 md:top-3 md:left-1/2 md:right-auto md:-translate-x-1/2 z-30 items-center gap-1.5 sm:gap-2 rounded-lg border-2 border-amber-400/85 bg-black/75 px-2.5 sm:px-4 py-1 sm:py-1.5 text-center shadow-[0_0_16px_rgba(250,204,21,0.3)] hover:border-amber-300 pointer-events-auto cursor-pointer"
         >
-          <AlertCircle className="h-4 w-4 shrink-0 text-amber-400" />
-          <span className="text-[11px] sm:text-xs font-bold tracking-wide text-white whitespace-nowrap max-w-[180px] sm:max-w-none truncate">
+          <AlertCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-amber-400" />
+          <span className="text-[10px] sm:text-xs font-bold tracking-wide text-white whitespace-nowrap max-w-[165px] sm:max-w-none truncate">
             মিশন: {hud.activeMission.title}
           </span>
-          <MapPin className="h-3.5 w-3.5 shrink-0 text-amber-400" />
+          <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-amber-400" />
         </button>
       )}
 
@@ -198,15 +200,15 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       </div>
 
       {/* হালকা বাংলা টোস্ট মেসেজ */}
-      {toast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 rounded-full border border-amber-300/80 bg-black/85 px-4 py-1 text-xs font-bold text-amber-200 shadow-lg">
-          {toast}
+      {activeToast && (
+        <div className="absolute top-24 md:top-16 left-1/2 -translate-x-1/2 z-30 max-w-[90vw] rounded-full border border-amber-300/80 bg-black/85 px-4 py-1 text-center text-xs font-bold text-amber-200 shadow-lg">
+          {activeToast}
         </div>
       )}
 
       {/* ক্রিকেট স্কোরবোর্ড ও টাইমিং বার */}
       {hud.cricket.active && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-[320px] sm:w-[390px] rounded-xl border border-emerald-500/75 bg-slate-950/92 p-3 text-xs shadow-2xl pointer-events-auto">
+        <div className="absolute top-24 md:top-16 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-[390px] rounded-xl border border-emerald-500/75 bg-slate-950/92 p-3 text-xs shadow-2xl pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="font-bold text-emerald-400">{hud.cricket.teamName}</span>
             <span className="font-mono-num text-base font-bold text-white">
@@ -287,7 +289,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
       {/* ফুটবল মাঠের স্কোর */}
       {hud.football.active && !hud.cricket.active && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 rounded-lg border border-lime-500/60 bg-slate-950/90 px-4 py-1.5 text-xs text-center shadow-lg">
+        <div className="absolute top-24 md:top-16 left-1/2 -translate-x-1/2 z-30 max-w-[90vw] rounded-lg border border-lime-500/60 bg-slate-950/90 px-4 py-1.5 text-xs text-center shadow-lg">
           <span className="font-bold text-lime-400">গ্রামের ফুটবল</span>
           <span className="mx-2 text-slate-500">·</span>
           <span className="font-mono-num text-white">গোল: {hud.football.goals}</span>
@@ -296,9 +298,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </div>
       )}
 
-      {/* কাছে এলে কাজের বাটন (দরজা খুলুন, কথা বলুন, গাড়ি চালান) */}
+      {/* কাছে এলে কাজের বাটন (দরজা খুলুন, কথা বলুন, গাড়ি/নৌকা চালান) */}
       {hud.activePrompt && !hud.cricket.active && !hud.dialogue && !hud.isDead && (
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+        <div className="absolute bottom-44 sm:bottom-24 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
           <button
             type="button"
             onClick={() => {
@@ -307,7 +309,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               if (hud.activePrompt?.kind === 'vehicle') gm.input.vehicleToggle = true;
               else gm.input.interact = true;
             }}
-            className="flex items-center gap-2 rounded-full border-2 border-amber-300 bg-black/80 px-4 py-1.5 text-xs font-bold text-amber-200 shadow-lg hover:bg-black cursor-pointer"
+            className="flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-amber-300 bg-black/80 px-4 py-1.5 text-xs font-bold text-amber-200 shadow-lg hover:bg-black cursor-pointer"
           >
             {hud.activePrompt.kind === 'door' && <DoorOpen className="h-4 w-4 text-amber-300" />}
             <span>

@@ -62,11 +62,63 @@ export class WaterSystem {
     // Water Lilies (Shapla) in the Pond
     this.buildWaterLilies(-26, 22);
 
-    // Wooden River Boats & Fishing Boats (Nouka)
-    this.buildBoat(-88, 6, textures, 0, true);
-    this.buildBoat(-106, -42, textures, 1.8, false);
-    this.buildBoat(-96, 56, textures, 3.4, false);
-    this.buildBoat(-76, 11, textures, 0.8, true);
+    // Wooden River Ghats (Jetty Docks) on Village Shore & Padma Char
+    this.buildWoodenGhat(-68.5, 8, 10.5, textures);
+    this.buildWoodenGhat(-112.2, 8, 6.5, textures);
+
+    // Ambient distant river boats gliding along Padma River
+    this.buildBoat(-106, -68, textures, 1.8, false);
+    this.buildBoat(-96, 68, textures, 3.4, false);
+  }
+
+  private buildWoodenGhat(
+    centerX: number,
+    centerZ: number,
+    length: number,
+    textures: TextureLibrary
+  ): void {
+    const plankMat = new THREE.MeshStandardMaterial({
+      map: textures.woodPlank,
+      color: 0x7c4d28,
+      roughness: 0.86,
+    });
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x4a2e16, roughness: 0.9 });
+    const ropeMat = new THREE.MeshStandardMaterial({ color: 0xc29b61, roughness: 0.92 });
+    const deckGeo = new THREE.BoxGeometry(length, 0.2, 2.8);
+    const postGeo = new THREE.CylinderGeometry(0.11, 0.13, 2.8, 8);
+    const bollardGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.65, 8);
+    this.disposables.push(plankMat, postMat, ropeMat, deckGeo, postGeo, bollardGeo);
+
+    const deck = new THREE.Mesh(deckGeo, plankMat);
+    deck.position.set(centerX, -0.22, centerZ);
+    deck.castShadow = true;
+    deck.receiveShadow = true;
+    this.group.add(deck);
+
+    const half = length / 2 - 0.5;
+    for (let px = -half; px <= half + 0.01; px += Math.max(2.0, half)) {
+      for (const pz of [-1.15, 1.15]) {
+        const post = new THREE.Mesh(postGeo, postMat);
+        post.position.set(centerX + px, -1.35, centerZ + pz);
+        post.castShadow = true;
+        this.group.add(post);
+      }
+    }
+
+    // Mooring bollards at water tip
+    const tipX = centerX < -90 ? centerX + half : centerX - half;
+    for (const pz of [-1.15, 1.15]) {
+      const bollard = new THREE.Mesh(bollardGeo, postMat);
+      bollard.position.set(tipX, 0.08, centerZ + pz);
+      bollard.castShadow = true;
+      this.group.add(bollard);
+
+      const ropeRing = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.035, 6, 12), ropeMat);
+      ropeRing.rotation.x = Math.PI / 2;
+      ropeRing.position.set(tipX, 0.16, centerZ + pz);
+      this.group.add(ropeRing);
+      this.disposables.push(ropeRing.geometry);
+    }
   }
 
   private buildWaterLilies(cx: number, cz: number): void {

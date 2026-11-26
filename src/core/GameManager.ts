@@ -112,6 +112,8 @@ export class GameManager {
   private isDead = false;
   private deathReason = '';
   private deathTimer = 0;
+  private noticeText = '';
+  private noticeTimer = 0;
   private gunTracerMesh: THREE.Mesh;
   private gunTracerTimer = 0;
   private onHudUpdate: (snap: HudSnapshot) => void;
@@ -264,7 +266,12 @@ export class GameManager {
     window.addEventListener('resize', this.handleResize);
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
+    window.addEventListener('pagehide', this.handlePageHide);
   }
+
+  private handlePageHide = (): void => {
+    this.persistSave();
+  };
 
   private handleResize = (): void => {
     const w = this.container.clientWidth || window.innerWidth;
@@ -460,13 +467,20 @@ export class GameManager {
   }
 
   public persistSave(): void {
+    const onWater = groundHeightAt(this.player.x, this.player.z) < -0.95;
+    const safePos: [number, number, number] = onWater
+      ? this.player.x < -105
+        ? [-118, groundHeightAt(-118, 8), 8]
+        : [-63, groundHeightAt(-63, 8), 8]
+      : [this.player.x, this.player.y, this.player.z];
+
     this.saveData = {
       ...this.saveData,
       hasPlayedIntro: true,
-      playerPosition: [this.player.x, this.player.y, this.player.z],
+      playerPosition: safePos,
       playerRotationY: this.player.rotationY,
       outfit: this.player.outfit,
-      activeVehicleId: this.player.drivingVehicleId,
+      activeVehicleId: null,
       completedMissionIds: this.missions.getCompletedIds(),
       cricketHighScore: Math.max(this.saveData.cricketHighScore, this.cricket.state.runs),
       footballGoals: Math.max(this.saveData.footballGoals, this.football.state.goals),
@@ -605,6 +619,10 @@ export class GameManager {
       }
     }
 
+    if (this.noticeTimer > 0) {
+      this.noticeTimer = Math.max(0, this.noticeTimer - dt);
+    }
+
     const activeVeh = this.player.drivingVehicleId
       ? this.vehicles.find((v) => v.id === this.player.drivingVehicleId) ?? null
       : null;
@@ -621,7 +639,8 @@ export class GameManager {
       this.village.doors,
       this.village.sitSpots,
       Boolean(activeVeh),
-      this.cricket.state.active
+      this.cricket.state.active,
+      activeVeh?.kind === 'boat'
     );
 
     if (this.isDead) {
@@ -631,13 +650,17 @@ export class GameManager {
       }
     } else {
       if (this.input.vehicleToggle) {
-        this.interaction.handleVehicleToggle(
+        const res = this.interaction.handleVehicleToggle(
           this.player,
           this.vehicles,
           prox.nearestVehicle,
           this.missions,
           this.audio
         );
+        if (res.notice) {
+          this.noticeText = res.notice;
+          this.noticeTimer = 3.0;
+        }
       }
 
       if (this.input.interact) {
@@ -658,9 +681,12 @@ export class GameManager {
       // Update Player or Vehicle
       if (activeVeh) {
         activeVeh.update(dt, this.input, this.village.colliders, this.dayNight.isNight());
-        this.player.x = activeVeh.x;
-        this.player.y = activeVeh.y + activeVeh.spec.seatOffset[1] - 0.35;
-        this.player.z = activeVeh.z;
+        const cos = Math.cos(activeVeh.rotationY);
+        const sin = Math.sin(activeVeh.rotationY);
+        const [sx, sy, sz] = activeVeh.spec.seatOffset;
+        this.player.x = activeVeh.x + sx * cos + sz * sin;
+        this.player.y = activeVeh.y + sy - 0.35;
+        this.player.z = activeVeh.z - sx * sin + sz * cos;
         this.player.rotationY = activeVeh.rotationY;
         this.player.rig.root.position.set(this.player.x, this.player.y, this.player.z);
         this.player.rig.root.rotation.y = activeVeh.rotationY;
@@ -668,7 +694,11 @@ export class GameManager {
           activeVeh.kind === 'motorcycle' ||
           activeVeh.kind === 'sports_bike' ||
           activeVeh.kind === 'bicycle' ||
-          activeVeh.kind === 'cycle_rickshaw';
+          activeVeh.kind === 'cycle_rickshaw' ||
+          activeVeh.kind === 'boat';
+        if (activeVeh.kind === 'boat') {
+          this.player.animation.update(this.player.rig, dt, 0, true, 'sitting', 'none', 0, false, false);
+        }
       } else {
         const { meleeHit, gunFired } = this.player.update(
           dt,
@@ -735,6 +765,14 @@ export class GameManager {
       this.missions.complete('mission-bridge')
     ) {
       this.audio.playMissionComplete();
+    }
+    if (
+      Math.hypot(this.player.x - -134, this.player.z - 8) < 22 &&
+      this.missions.complete('mission-river')
+    ) {
+      this.audio.playMissionComplete();
+      this.noticeText = 'অভিনন্দন! নৌকায় করে পদ্মার চরে পৌঁছে গেছেন!';
+      this.noticeTimer = 3.2;
     }
 
     // Weather & Day-Night
@@ -824,6 +862,7 @@ export class GameManager {
         deathReason: this.deathReason,
         isDriving: Boolean(activeVeh),
         vehicleName: activeVeh ? activeVeh.label : '',
+        vehicleKind: activeVeh ? activeVeh.kind : null,
         speedKmh: Math.round(speedKmh),
         cameraMode: this.cameraMode,
         posture: this.player.posture,
@@ -838,6 +877,7 @@ export class GameManager {
         outfit: this.player.outfit,
         timeLabel: this.dayNight.getTimeLabel(),
         weatherLabel: this.weather.getWeatherLabel(),
+        notice: this.noticeTimer > 0 ? this.noticeText : null,
         markers: [...this.village.markers, ...vehMarkers, ...missionMarker],
       });
     }
@@ -859,6 +899,7 @@ export class GameManager {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('keyup', this.handleKeyUp);
+    window.removeEventListener('pagehide', this.handlePageHide);
 
     this.persistSave();
     this.terrain.dispose();

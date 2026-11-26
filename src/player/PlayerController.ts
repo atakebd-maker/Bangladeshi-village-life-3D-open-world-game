@@ -102,6 +102,14 @@ export class PlayerController {
     if (x >= 63.5 && x <= 72.5 && z >= -44.5 && z <= -31.5) {
       return 0.28;
     }
+    // Village wooden ghat at Padma River shore
+    if (x >= -73.8 && x <= -63.2 && z >= 6.6 && z <= 9.4) {
+      return -0.12;
+    }
+    // Padma Char wooden ghat
+    if (x >= -115.5 && x <= -108.9 && z >= 6.6 && z <= 9.4) {
+      return -0.12;
+    }
     return groundHeightAt(x, z);
   }
 
@@ -230,7 +238,14 @@ export class PlayerController {
     colliders: BoxCollider[],
     trees: Array<{ x: number; z: number; r: number }>
   ): boolean {
-    if (groundHeightAt(x, z) < -1.15 && !(x >= 10.2 && x <= 13.8 && z >= -45 && z <= -31)) {
+    const onGhat =
+      (x >= -73.8 && x <= -63.2 && z >= 6.6 && z <= 9.4) ||
+      (x >= -115.5 && x <= -108.9 && z >= 6.6 && z <= 9.4);
+    if (
+      groundHeightAt(x, z) < -1.15 &&
+      !onGhat &&
+      !(x >= 10.2 && x <= 13.8 && z >= -45 && z <= -31)
+    ) {
       return false;
     }
     const r = 0.36;

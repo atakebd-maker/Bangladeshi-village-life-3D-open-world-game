@@ -19,7 +19,8 @@ export class PlayerInteraction {
     doors: DoorInteractable[],
     sitSpots: SitSpot[],
     isDriving: boolean,
-    cricketActive: boolean
+    cricketActive: boolean,
+    isBoat = false
   ): {
     prompt: InteractionPrompt | null;
     nearestVehicle: VehicleEntity | null;
@@ -31,7 +32,11 @@ export class PlayerInteraction {
   } {
     if (isDriving) {
       return {
-        prompt: { id: 'exit-veh', label: 'গাড়ি থেকে নামুন', kind: 'vehicle' },
+        prompt: {
+          id: 'exit-veh',
+          label: isBoat ? 'নৌকা থেকে নামুন' : 'গাড়ি থেকে নামুন',
+          kind: 'vehicle',
+        },
         nearestVehicle: null,
         nearestNpc: null,
         nearestDoor: null,
@@ -67,18 +72,26 @@ export class PlayerInteraction {
       };
     }
 
-    let bestDist = 4.2;
+    let bestDist = Infinity;
     let nearestVehicle: VehicleEntity | null = null;
     for (const v of vehicles) {
+      const maxReach = v.kind === 'boat' ? 5.8 : 4.2;
       const d = Math.hypot(v.x - px, v.z - pz);
-      if (d < bestDist) {
+      if (d < maxReach && d < bestDist) {
         bestDist = d;
         nearestVehicle = v;
       }
     }
     if (nearestVehicle) {
       return {
-        prompt: { id: nearestVehicle.id, label: `${nearestVehicle.label} চালান`, kind: 'vehicle' },
+        prompt: {
+          id: nearestVehicle.id,
+          label:
+            nearestVehicle.kind === 'boat'
+              ? `${nearestVehicle.label} নিয়ে নদী পার হোন`
+              : `${nearestVehicle.label} চালান`,
+          kind: 'vehicle',
+        },
         nearestVehicle,
         nearestNpc: null,
         nearestDoor: null,

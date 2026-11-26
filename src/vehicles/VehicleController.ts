@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { BoxCollider } from '../buildings/HouseModels';
 import { InputState, VehicleKind } from '../types/game';
-import { groundHeightAt } from '../world/TerrainSystem';
+import { groundHeightAt, riverBankX } from '../world/TerrainSystem';
 
 export interface VehicleSpec {
   id: string;
@@ -24,6 +24,8 @@ export class VehicleEntity {
   public readonly wheels: THREE.Object3D[] = [];
   public readonly steerPivots: THREE.Object3D[] = [];
   public headlight: THREE.SpotLight | null = null;
+  public lanternLight: THREE.PointLight | null = null;
+  public oarPivot: THREE.Group | null = null;
   public bodyGroup = new THREE.Group();
 
   public x: number;
@@ -34,6 +36,8 @@ export class VehicleEntity {
   public steerAngle = 0;
   public hasDriver = false;
   private suspensionPhase = 0;
+  private wavePhase = Math.random() * Math.PI * 2;
+  private oarPhase = 0;
 
   constructor(spec: VehicleSpec, x: number, z: number, rotY: number) {
     this.id = spec.id;
@@ -41,7 +45,7 @@ export class VehicleEntity {
     this.kind = spec.kind;
     this.spec = spec;
     this.x = x;
-    this.y = groundHeightAt(x, z);
+    this.y = spec.kind === 'boat' ? -0.74 : groundHeightAt(x, z);
     this.z = z;
     this.rotationY = rotY;
     this.group.position.set(this.x, this.y, this.z);
@@ -59,8 +63,13 @@ export class VehicleEntity {
     colliders: BoxCollider[],
     isNight: boolean
   ): void {
+    const isBoat = this.kind === 'boat';
+
     if (this.headlight) {
       this.headlight.intensity = isNight && this.hasDriver ? 3.5 : 0;
+    }
+    if (this.lanternLight) {
+      this.lanternLight.intensity = isNight ? 2.6 : 0;
     }
 
     if (this.hasDriver) {
@@ -76,37 +85,70 @@ export class VehicleEntity {
           this.speed -= this.spec.accel * 0.55 * input.brake * dt;
         }
       } else {
-        this.speed = THREE.MathUtils.damp(this.speed, 0, 2.4, dt);
+        this.speed = THREE.MathUtils.damp(this.speed, 0, isBoat ? 1.3 : 2.4, dt);
       }
 
       this.speed = THREE.MathUtils.clamp(
         this.speed,
-        -this.spec.maxSpeed * 0.35,
+        -this.spec.maxSpeed * 0.38,
         this.spec.maxSpeed
       );
 
-      if (Math.abs(this.speed) > 0.15) {
-        const dirSign = this.speed >= 0 ? 1 : -1;
-        this.rotationY +=
-          this.steerAngle * this.spec.turnRate * dirSign * Math.min(1, Math.abs(this.speed) / 4) * dt;
+      if (Math.abs(this.speed) > 0.12 || (isBoat && Math.abs(this.steerAngle) > 0.08)) {
+        const dirSign = this.speed >= -0.05 ? 1 : -1;
+        const speedFactor = isBoat ? 0.45 + 0.55 * Math.min(1, Math.abs(this.speed) / 3) : Math.min(1, Math.abs(this.speed) / 4);
+        this.rotationY += this.steerAngle * this.spec.turnRate * dirSign * speedFactor * dt;
       }
     } else {
-      this.speed = THREE.MathUtils.damp(this.speed, 0, 4, dt);
+      this.speed = THREE.MathUtils.damp(this.speed, 0, isBoat ? 1.8 : 4, dt);
       this.steerAngle = THREE.MathUtils.damp(this.steerAngle, 0, 8, dt);
     }
 
     if (Math.abs(this.speed) > 0.02) {
       const fx = Math.sin(this.rotationY);
       const fz = Math.cos(this.rotationY);
-      const nextX = THREE.MathUtils.clamp(this.x + fx * this.speed * dt, -146, 146);
-      const nextZ = THREE.MathUtils.clamp(this.z + fz * this.speed * dt, -146, 146);
+      const maxRange = isBoat ? 166 : 146;
+      const nextX = THREE.MathUtils.clamp(this.x + fx * this.speed * dt, -maxRange, maxRange);
+      const nextZ = THREE.MathUtils.clamp(this.z + fz * this.speed * dt, -maxRange, maxRange);
 
-      if (this.canDriveAt(nextX, nextZ, colliders)) {
+      if (isBoat ? this.canBoatFloatAt(nextX, nextZ) : this.canDriveAt(nextX, nextZ, colliders)) {
         this.x = nextX;
         this.z = nextZ;
       } else {
-        this.speed *= -0.25;
+        // Slide smoothly along shoreline/obstacles instead of harsh bounce
+        if (isBoat && this.canBoatFloatAt(nextX, this.z)) {
+          this.x = nextX;
+          this.speed *= 0.85;
+        } else if (isBoat && this.canBoatFloatAt(this.x, nextZ)) {
+          this.z = nextZ;
+          this.speed *= 0.85;
+        } else {
+          this.speed *= -0.2;
+        }
       }
+    }
+
+    if (isBoat) {
+      this.wavePhase += dt * 1.6;
+      this.y = -0.74 + Math.sin(this.wavePhase) * 0.055;
+      this.group.position.set(this.x, this.y, this.z);
+      this.group.rotation.y = this.rotationY;
+
+      const bank = -this.steerAngle * 0.14 * Math.min(1, Math.abs(this.speed) / 4);
+      this.bodyGroup.rotation.z = Math.sin(this.wavePhase * 0.85) * 0.032 + bank;
+      this.bodyGroup.rotation.x = Math.cos(this.wavePhase * 0.72) * 0.022;
+
+      if (this.oarPivot) {
+        if (this.hasDriver && Math.abs(this.speed) > 0.25) {
+          this.oarPhase += dt * (3.2 + Math.abs(this.speed) * 0.55);
+          this.oarPivot.rotation.x = Math.sin(this.oarPhase) * 0.48 + 0.15;
+          this.oarPivot.rotation.z = 0.55 + Math.cos(this.oarPhase) * 0.18;
+        } else {
+          this.oarPivot.rotation.x = THREE.MathUtils.damp(this.oarPivot.rotation.x, 0.22, 5, dt);
+          this.oarPivot.rotation.z = THREE.MathUtils.damp(this.oarPivot.rotation.z, 0.5, 5, dt);
+        }
+      }
+      return;
     }
 
     this.y = this.sampleRoadOrGround(this.x, this.z);
@@ -140,6 +182,16 @@ export class VehicleEntity {
       return 0.28;
     }
     return groundHeightAt(x, z);
+  }
+
+  private canBoatFloatAt(x: number, z: number): boolean {
+    if (x > riverBankX(z) - 2.2 || x < -165) return false;
+    if (Math.abs(z) > 158) return false;
+    // Stay clear of dry sand center on Padma Char & village wooden ghat pilings
+    if (groundHeightAt(x, z) > -0.58) return false;
+    if (x > -74.5 && x < -63 && Math.abs(z - 8) < 2.4) return false;
+    if (x > -115.5 && x < -108.5 && Math.abs(z - 8) < 2.2) return false;
+    return true;
   }
 
   private canDriveAt(x: number, z: number, colliders: BoxCollider[]): boolean {

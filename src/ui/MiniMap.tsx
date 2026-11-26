@@ -49,6 +49,24 @@ export const MiniMap: React.FC<MiniMapProps> = ({
       ctx.fillRect(0, 0, rx, h);
     }
 
+    // Padma Char Island (-134, 8) across the river
+    const [charX, charY] = toMap(-134, 8);
+    ctx.fillStyle = '#a18657';
+    ctx.beginPath();
+    ctx.arc(charX, charY, 22 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#4d7c36';
+    ctx.beginPath();
+    ctx.arc(charX, charY, 13 * scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wooden Ghats on both banks at z = 8
+    const [g1x, g1y] = toMap(-68.5, 8);
+    const [g2x, g2y] = toMap(-112, 8);
+    ctx.fillStyle = '#b45309';
+    ctx.fillRect(g1x - 4, g1y - 1.5, 8, 3);
+    ctx.fillRect(g2x - 3, g2y - 1.5, 6, 3);
+
     // Irrigation Canal (z = -38)
     const [, cy] = toMap(0, -38);
     ctx.fillStyle = '#0e7490';

@@ -23,24 +23,24 @@ export const MainMenu: React.FC<MainMenuProps> = ({
   const [showAbout, setShowAbout] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-30 flex items-stretch justify-between pointer-events-none">
-      {/* বাম পাশের টাইটেল ও তথ্য */}
-      <div className="flex flex-col justify-between bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent p-6 sm:p-10 pointer-events-auto max-w-md">
+    <div className="fixed inset-0 z-30 flex flex-col sm:flex-row items-stretch justify-between overflow-y-auto pointer-events-none">
+      {/* বাম/উপরের টাইটেল ও তথ্য */}
+      <div className="flex flex-col justify-between bg-gradient-to-b sm:bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent p-5 sm:p-10 pointer-events-auto sm:max-w-md shrink-0">
         <div>
           <p className="text-xs font-bold tracking-[0.34em] text-amber-400 uppercase">
             TAHSIN STUDIO
           </p>
-          <h1 className="font-display mt-2 text-2xl font-bold leading-tight tracking-wide text-white sm:text-4xl">
+          <h1 className="font-display mt-1.5 sm:mt-2 text-2xl font-bold leading-tight tracking-wide text-white sm:text-4xl">
             বাংলাদেশ
             <span className="block text-emerald-400">ভিলেজ লাইফ 3D</span>
           </h1>
-          <p className="mt-3 text-xs leading-relaxed text-slate-300 sm:text-sm">
-            সোনারগাঁও গ্রাম ঘুরে দেখুন — মোটরসাইকেল, সিএনজি ও রিকশা চালান, ঘরের দরজা খুলে
-            ভেতরে প্রবেশ করুন, গ্রামবাসীর সাথে কথা বলুন এবং ক্রিকেট খেলুন।
+          <p className="mt-2 sm:mt-3 text-xs leading-relaxed text-slate-300 sm:text-sm">
+            সোনারগাঁও গ্রাম ঘুরে দেখুন — মোটরসাইকেল, সিএনজি, রিকশা ও পদ্মা নদীতে কাঠের নৌকা
+            চালান, ঘরের দরজা খুলে ভেতরে প্রবেশ করুন, গ্রামবাসীর সাথে কথা বলুন এবং ক্রিকেট খেলুন।
           </p>
         </div>
 
-        <div className="flex items-center gap-4 text-xs text-slate-300">
+        <div className="mt-3 sm:mt-0 flex items-center gap-4 text-xs text-slate-300">
           <span>
             মিশন: <strong className="font-mono-num text-white">{completedMissions}/৫</strong>
           </span>
@@ -52,8 +52,8 @@ export const MainMenu: React.FC<MainMenuProps> = ({
         </div>
       </div>
 
-      {/* ডান পাশের মেনু বাটনসমূহ */}
-      <div className="flex flex-col justify-center gap-2 bg-gradient-to-l from-slate-950/92 via-slate-950/65 to-transparent px-4 py-3 sm:px-10 sm:py-6 pointer-events-auto min-w-[210px] sm:min-w-[275px] overflow-y-auto">
+      {/* ডান/নিচের মেনু বাটনসমূহ */}
+      <div className="flex flex-col justify-end sm:justify-center gap-2 bg-gradient-to-t sm:bg-gradient-to-l from-slate-950/95 via-slate-950/75 to-transparent px-5 py-4 sm:px-10 sm:py-6 pointer-events-auto w-full sm:w-auto sm:min-w-[275px] overflow-y-auto">
         {hasContinue && (
           <button
             type="button"
@@ -129,7 +129,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
 
       {showAbout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 pointer-events-auto">
-          <div className="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-900 p-6 text-slate-200 shadow-2xl">
+          <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 p-5 sm:p-6 text-slate-200 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <p className="text-[11px] font-bold tracking-[0.26em] text-amber-400 uppercase">

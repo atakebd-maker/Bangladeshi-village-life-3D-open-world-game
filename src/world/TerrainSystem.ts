@@ -6,6 +6,13 @@ export function riverBankX(z: number): number {
 }
 
 export function groundHeightAt(x: number, z: number): number {
+  // Scenic Padma Char (Sand Island across the Padma River) centered at (-134, 8)
+  const charDist = Math.hypot(x - -134, z - 8);
+  if (charDist < 24) {
+    const t = THREE.MathUtils.clamp((24 - charDist) / 10, 0, 1);
+    return -2.4 + t * 3.1; // rises cleanly from -2.4 riverbed to +0.70 dry island
+  }
+
   // Padma river channel on west
   const bank = riverBankX(z);
   if (x < bank + 5) {
@@ -49,7 +56,9 @@ export function groundHeightAt(x: number, z: number): number {
 }
 
 export function getLocationName(x: number, z: number): string {
-  if (x < riverBankX(z) + 12) return 'পদ্মা নদীর পাড়';
+  if (Math.hypot(x - -134, z - 8) < 24) return 'পদ্মার চর (পশ্চিম পাড়)';
+  if (x < riverBankX(z) - 3) return 'পদ্মা নদী';
+  if (x < riverBankX(z) + 12) return 'পদ্মা নদীর ঘাট';
   if (Math.hypot(x - -26, z - 22) < 20) return 'গ্রামের পুকুর পাড়';
   if (Math.hypot(x - 18, z - 66) < 32) return 'গ্রামের ক্রিকেট মাঠ';
   if (Math.abs(x + 34) < 24 && Math.abs(z - 88) < 16) return 'গ্রামের ফুটবল মাঠ';

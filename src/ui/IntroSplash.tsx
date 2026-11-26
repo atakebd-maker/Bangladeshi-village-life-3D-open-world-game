@@ -48,15 +48,15 @@ export const IntroSplash: React.FC<IntroSplashProps> = ({
           <div className="mt-3 h-[2px] w-44 bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
         </div>
       ) : (
-        <div className="relative h-full w-full overflow-hidden bg-black">
+        <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-black">
           <img
             src="/assets/aistudio/image_7de12f21.png"
             alt="BANGLADESH VILLAGE LIFE 3D - Developed by TAHSIN STUDIO"
             referrerPolicy="no-referrer"
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full portrait:object-contain landscape:object-cover object-center"
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
-          <div className="pointer-events-none absolute bottom-4 left-6 right-6 flex items-center justify-between text-xs text-slate-200">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+          <div className="pointer-events-none absolute bottom-4 left-4 right-4 sm:left-6 sm:right-6 flex items-center justify-between text-xs text-slate-200">
             <span className="font-semibold tracking-wider text-amber-300">TAHSIN STUDIO</span>
             <span className="text-slate-200">গ্রামের জগৎ শুরু হচ্ছে...</span>
           </div>

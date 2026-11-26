@@ -44,9 +44,9 @@ export const VILLAGE_MISSIONS: MissionItem[] = [
   {
     id: 'mission-river',
     title: 'পদ্মা নদীর ঘাট ভ্রমণ',
-    description: 'পশ্চিম পাড়ে পদ্মা নদীর ঘাটে জেলে মনিরের সাথে দেখা করুন।',
-    targetLocation: 'পদ্মা নদীর পাড়',
-    targetX: -62,
+    description: 'পশ্চিম পাড়ে পদ্মা নদীর ঘাটে জেলে মনিরের সাথে দেখা করুন অথবা নৌকায় চড়ে পদ্মার চরে ঘুরে আসুন।',
+    targetLocation: 'পদ্মা নদীর ঘাট / পদ্মার চর',
+    targetX: -68,
     targetZ: 8,
     completed: false,
     reward: 'তাজা পদ্মার রুই মাছ',

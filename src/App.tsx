@@ -22,6 +22,7 @@ const INITIAL_HUD: HudSnapshot = {
   deathReason: '',
   isDriving: false,
   vehicleName: '',
+  vehicleKind: null,
   speedKmh: 0,
   cameraMode: 'third_person',
   posture: 'standing',
@@ -48,25 +49,11 @@ const INITIAL_HUD: HudSnapshot = {
   outfit: 'lungi_genji',
   timeLabel: 'সকাল · ৯:১২',
   weatherLabel: 'রোদেলা',
+  notice: null,
   markers: [],
 };
 
-async function tryRequestLandscape(): Promise<void> {
-  try {
-    const isCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches;
-    if (isCoarsePointer && !document.fullscreenElement && document.documentElement.requestFullscreen) {
-      await document.documentElement.requestFullscreen().catch(() => {});
-    }
-    const orientation = screen.orientation as unknown as {
-      lock?: (mode: string) => Promise<void>;
-    };
-    if (orientation?.lock) {
-      await orientation.lock('landscape');
-    }
-  } catch {
-    // ব্রাউজার কেবল ফুলস্ক্রিন বা অ্যান্ড্রয়েড অ্যাপে ল্যান্ডস্কেপ লক অনুমোদন করে
-  }
-}
+// গেম পোর্ট্রেট (সোজাভাবে) ও ল্যান্ডস্কেপ উভয় মোডেই স্বাভাবিকভাবে চলবে
 
 export default function App() {
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
@@ -116,7 +103,6 @@ export default function App() {
   }, [initialSave]);
 
   const startGameplay = (isNewGame: boolean) => {
-    tryRequestLandscape();
     const gm = gameRef.current;
     if (!gm) return;
     gm.audio.playUiClick();
@@ -190,7 +176,6 @@ export default function App() {
         <IntroSplash
           canSkip={initialSave.hasPlayedIntro}
           onStartAudio={() => {
-            tryRequestLandscape();
             gameRef.current?.audio.playStudioIntroChime();
           }}
           onComplete={handleIntroComplete}

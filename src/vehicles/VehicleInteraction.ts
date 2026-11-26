@@ -1,4 +1,5 @@
 import { TextureLibrary } from '../materials/ProceduralTextures';
+import { BoatController } from './BoatController';
 import { CarController } from './CarController';
 import { MotorcycleController } from './MotorcycleController';
 import { RickshawController } from './RickshawController';
@@ -37,6 +38,17 @@ export function spawnVillageVehicles(textures: TextureLibrary): VehicleEntity[] 
   list.push(CarController.createFourWheeler('micro-bus', 'microbus', 64, 62, 0, 0xf1f5f9, textures));
   list.push(CarController.createFourWheeler('local-bus', 'local_bus', 66, 24, Math.PI, 0x15803d, textures));
   list.push(CarController.createFourWheeler('truck-hwy', 'truck', 72, -24, 0, 0xf59e0b, textures));
+
+  // 8. Traditional Wooden Boats (নৌকা) moored along the Padma River Ghats & Padma Char
+  list.push(
+    BoatController.createBoat('boat-ghat-main', 'ছইওয়ালা নৌকা', -75.4, 10.6, -Math.PI / 2, true, 0x6b3e1d, textures)
+  );
+  list.push(
+    BoatController.createBoat('boat-ghat-north', 'কাঠের ডিঙি নৌকা', -71.2, -16, -Math.PI / 2, false, 0x78350f, textures)
+  );
+  list.push(
+    BoatController.createBoat('boat-char', 'মাছ ধরার নৌকা', -107.6, 10.4, Math.PI / 2, true, 0x5c3415, textures)
+  );
 
   return list;
 }

@@ -26,10 +26,19 @@ export class VehicleSounds {
     this.engineOsc.start();
   }
 
+  private splashCooldown = 0;
+
   public update(drivingKind: string | null, speedKmh: number, hornPressed: boolean): void {
     const now = this.ctx.currentTime;
-    if (!drivingKind || drivingKind === 'bicycle' || drivingKind === 'cycle_rickshaw') {
+    if (!drivingKind || drivingKind === 'bicycle' || drivingKind === 'cycle_rickshaw' || drivingKind === 'boat') {
       this.engineGain.gain.setTargetAtTime(0, now, 0.08);
+      if (drivingKind === 'boat' && Math.abs(speedKmh) > 2.5) {
+        this.splashCooldown -= 0.016;
+        if (this.splashCooldown <= 0) {
+          this.splashCooldown = Math.max(0.45, 0.95 - Math.abs(speedKmh) * 0.012);
+          this.playOarSplash();
+        }
+      }
     } else {
       const isHeavy = drivingKind === 'local_bus' || drivingKind === 'truck' || drivingKind === 'jeep';
       const isCng = drivingKind === 'cng' || drivingKind === 'auto_rickshaw';
@@ -49,6 +58,29 @@ export class VehicleSounds {
     }
   }
 
+  private playOarSplash(): void {
+    const now = this.ctx.currentTime;
+    const len = Math.floor(this.ctx.sampleRate * 0.16);
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.sin((i / len) * Math.PI);
+    }
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    const bp = this.ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.setValueAtTime(520, now);
+    bp.frequency.exponentialRampToValueAtTime(220, now + 0.15);
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.075, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(this.out);
+    src.start(now);
+  }
+
   private playHorn(kind: string): void {
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
@@ -62,6 +94,16 @@ export class VehicleSounds {
       g.connect(this.out);
       osc.start(now);
       osc.stop(now + 0.3);
+    } else if (kind === 'boat') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(340, now + 0.26);
+      g.gain.setValueAtTime(0.11, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(g);
+      g.connect(this.out);
+      osc.start(now);
+      osc.stop(now + 0.29);
     } else {
       osc.type = 'sawtooth';
       const f = kind === 'local_bus' || kind === 'truck' ? 185 : 390;

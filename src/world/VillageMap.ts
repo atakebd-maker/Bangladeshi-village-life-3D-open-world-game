@@ -61,6 +61,12 @@ export class VillageMap {
     this.group.add(HouseModels.createVillageHouse('door-east-tin', 'tin', 34, -58, Math.PI, textures, this.colliders, this.doors, 'red'));
     this.group.add(HouseModels.createOutdoorKitchen(28, -54, textures));
     this.group.add(HouseModels.createHaystack(42, -54));
+
+    // 5. Padma River Ghat & Padma Char Island landmarks
+    this.addMarker('ghat', 'পদ্মা নদীর ঘাট', -68, 8, '#06b6d4', 'building');
+    this.group.add(InteriorSystem.createCharpoi('charpoi-char', -132, 8, 0.5, textures, this.sitSpots));
+    this.group.add(HouseModels.createHaystack(-140, 12));
+    this.addMarker('padma-char', 'পদ্মার চর (দ্বীপ)', -134, 8, '#f59e0b', 'building');
   }
 
   private buildBazaar(textures: TextureLibrary): void {
@@ -451,6 +457,8 @@ export class VillageMap {
       [62, -24, 7.9],
       [60, 72, 8.2],
       [-55, 75, 7.5],
+      [-136, 2, 7.8],
+      [-129, 15, 7.2],
     ];
     for (const [x, z, h] of coconutSpots) addCoconutTree(x, z, h);
 
