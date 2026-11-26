@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="48" fill="#0b1220"/>
+  <circle cx="128" cy="116" r="54" fill="#d93829"/>
+  <path d="M24 196 C72 170, 184 170, 232 196 L232 232 L24 232 Z" fill="#15803d"/>
+  <text x="128" y="216" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" fill="#f8fafc" letter-spacing="3">TAHSIN</text>
+</svg>

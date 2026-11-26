@@ -1,0 +1,18 @@
+{
+  "name": "BANGLADESH VILLAGE LIFE 3D",
+  "short_name": "BD Village 3D",
+  "description": "Authentic 3D open-world rural Bangladesh game developed by TAHSIN STUDIO",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#070b12",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/icons/studio-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
